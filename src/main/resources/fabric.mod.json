@@ -3,7 +3,7 @@
 	"id": "oasis-floodfill-generator",
 	"version": "${version}",
 	"name": "Oasis FloodFill Generator",
-	"description": "Mod for generating automatic flood fill support for use in Iris Shaders",
+	"description": "Mod for generating automatic flood-fill support for use in Iris Shaders",
 	"authors": [
 		"MikiP98 | https://github.com/MikiP98"
 	],
