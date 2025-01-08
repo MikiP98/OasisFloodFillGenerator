@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "oasis-floodfill-generator",
+	"version": "${version}",
+	"name": "Oasis FloodFill Generator",
+	"description": "Mod for generating automatic flood fill support for use in Iris Shaders",
+	"authors": [
+		"MikiP98 | https://github.com/MikiP98"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/oasis-floodfill-generator",
+		"sources": "https://github.com/MikiP98/OasisFloodFillGenerator"
+	},
+	"license": "Apache-2.0",
+	"icon": "assets/oasis-floodfill-generator/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"io.github.mikip98.ofg.OasisFloodFillGenerator"
+		],
+		"client": [
+			"io.github.mikip98.ofg.OasisFloodFillGeneratorClient"
+		]
+	},
+	"mixins": [
+		{
+			"config": "oasis-floodfill-generator.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.9",
+		"minecraft": "~1.20",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"iris": ">=1.7"
+	}
+}
