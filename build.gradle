@@ -44,14 +44,12 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Main library
-	modImplementation files('libs/data-extraction-library-0.2.0.jar')
-	modImplementation files('libs/data-extraction-library-0.2.0-sources.jar')
-	modImplementation files('libs/javadoc.jar')
+	modImplementation files('libs/data-extraction-library-0.2.0.jar', 'libs/data-extraction-library-0.2.0-sources.jar')
+//	modImplementation files('libs/data-extraction-library-0.2.0-sources.jar')
+//	modApi files('libs/data-extraction-library-0.2.0-sources.jar')
 
 //	// Sources (optional, for debugging or IDE support)
 //	modImplementation files('libs/data-extraction-library-0.2.0-sources.jar')
-//	// Javadoc (optional, for IDE documentation)
-//	modImplementation files('libs/data-extraction-library-0.2.0-javadoc.jar')
 }
 
 processResources {

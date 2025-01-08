@@ -1,6 +1,7 @@
 package io.github.mikip98.ofg;
 
 import io.github.mikip98.del.api.BlockstatesAPI;
+import io.github.mikip98.ofg.iProperties.FloodFill;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import org.slf4j.Logger;
@@ -34,11 +35,22 @@ public class OasisFloodFillGeneratorClient implements ClientModInitializer {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void generateFloodFill() {
+	private static void generateFloodFill() {
 		LOGGER.info("Generating flood fill");
 
-		Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocks = BlockstatesAPI.getLightEmittingBlocksData();
-		Map<String, List<String>> translucentBlocks = BlockstatesAPI.getTranslucentBlockNames();
+		// ModId -> BlockstateId -> Light level -> Set of Property value pairs
+		Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocksData = BlockstatesAPI.getLightEmittingBlocksData();
 
+		// ModId -> List of BlockstateIds
+		Map<String, List<String>> translucentBlocksData = BlockstatesAPI.getTranslucentBlockNames();
+
+		// ModId -> BlockstateId -> block volume
+		Map<String, Map<String, Double>> nonFullBlocksData = BlockstatesAPI.getNonFullBlocks();
+
+		FloodFill floodFill = new FloodFill();
+
+		floodFill.generateFloodfillForLightEmittingBlocks(lightEmittingBlocksData);
 	}
+
+
 }
