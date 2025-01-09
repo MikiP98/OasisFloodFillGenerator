@@ -1,7 +1,7 @@
 package io.github.mikip98.ofg;
 
 import io.github.mikip98.del.api.BlockstatesAPI;
-import io.github.mikip98.ofg.iProperties.FloodFill;
+import io.github.mikip98.ofg.property.FloodFill;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import org.slf4j.Logger;
@@ -47,9 +47,12 @@ public class OasisFloodFillGeneratorClient implements ClientModInitializer {
 		// ModId -> BlockstateId -> block volume
 		Map<String, Map<String, Double>> nonFullBlocksData = BlockstatesAPI.getNonFullBlocks();
 
+
 		FloodFill floodFill = new FloodFill();
 
 		floodFill.generateFloodfillForLightEmittingBlocks(lightEmittingBlocksData);
+		floodFill.generateFloodfillForTranslucentBlocks(translucentBlocksData);
+		floodFill.generateFloodfillForNonFullBlocks(nonFullBlocksData);
 	}
 
 
