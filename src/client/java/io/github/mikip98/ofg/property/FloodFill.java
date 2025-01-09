@@ -1,8 +1,6 @@
 package io.github.mikip98.ofg.property;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class FloodFill {
     // ModId -> BlockstateId -> Set of Property value pairs
@@ -14,7 +12,7 @@ public class FloodFill {
     Map<Short, List<String>> floodFillColourItemEntries;
 
     // occlusion category entries; 0, 0.25, 0.50, 0.75; 1 is just ignored
-    Map<Byte, List<String>> floodFillIgnoreEntries;
+    Map<Integer, List<String>> floodFillIgnoreEntries;
 
 
     @SuppressWarnings("rawtypes")
@@ -41,11 +39,20 @@ public class FloodFill {
                 volume = Math.round(volume * 4) / 4.0d;
                 if (volume == 1.0) continue;
 
-                floodFillIgnoreEntries.computeIfAbsent()
+                Integer occlusionEntryId = volume2entry.get(volume);
+                floodFillIgnoreEntries.computeIfAbsent(occlusionEntryId, k -> new ArrayList<>()).add(blockstateId);
             }
         }
     }
+    public static HashMap<Double, Integer> volume2entry = new HashMap<>(Map.of(
+            .0, 50,
+            0.25, 51,
+            0.5, 52,
+            0.75, 53
+    ));
 
+
+    // TODO: Rework this system so if a blockstate with selected properties is supported, return the blockstate with other properties
 
     @SuppressWarnings("rawtypes")
     private boolean isBlockstateSupported(String modId, String blockstate, Map<String, Comparable> properties) {
