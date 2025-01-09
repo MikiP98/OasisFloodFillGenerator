@@ -1,22 +1,27 @@
 package io.github.mikip98.ofg.property;
 
+import io.github.mikip98.del.structures.SimplifiedProperty;
+
 import java.util.*;
+
+import static io.github.mikip98.ofg.OasisFloodFillGeneratorClient.LOGGER;
 
 public class FloodFill {
     // ModId -> BlockstateId -> Set of Property value pairs
     @SuppressWarnings("rawtypes")
-    Map<String, Map<String, Set<Map<String, Comparable>>>> alreadySupportedBlockstates;
+    Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates = new HashMap<>();
+
 
     // Auto FloodFill format color -> all the blockstates w properties entries
-    Map<Short, List<String>> floodFillColourBlockEntries;
-    Map<Short, List<String>> floodFillColourItemEntries;
+    Map<Short, List<String>> floodFillColourBlockEntries = new HashMap<>();
+    Map<Short, List<String>> floodFillColourItemEntries = new HashMap<>();
 
     // occlusion category entries; 0, 0.25, 0.50, 0.75; 1 is just ignored
-    Map<Integer, List<String>> floodFillIgnoreEntries;
+    Map<Integer, List<String>> floodFillIgnoreEntries = new HashMap<>();
 
 
     @SuppressWarnings("rawtypes")
-    public void generateFloodfillForLightEmittingBlocks(Map<String, Map<String, Map<Byte, Set<Map<String, Comparable>>>>> lightEmittingBlocksData) {
+    public void generateFloodfillForLightEmittingBlocks(Map<String, Map<String, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocksData) {
 
     }
 
@@ -31,7 +36,7 @@ public class FloodFill {
 
             for (Map.Entry<String, Double> blockEntry : blocksData.entrySet()) {
                 String blockstateId = blockEntry.getKey();
-                if (isBlockstateSupported(modId, blockstateId)) continue;
+//                if (isBlockstateSupported(modId, blockstateId)) continue; // TODO: Bring this back
                 Double volume = blockEntry.getValue();
 
                 // Round volume to either of the categories: 0, 0.25, 0.5, 0.75, 1
@@ -40,9 +45,14 @@ public class FloodFill {
                 if (volume == 1.0) continue;
 
                 Integer occlusionEntryId = volume2entry.get(volume);
-                floodFillIgnoreEntries.computeIfAbsent(occlusionEntryId, k -> new ArrayList<>()).add(blockstateId);
+                floodFillIgnoreEntries.computeIfAbsent(occlusionEntryId, k -> new ArrayList<>()).add(modId + ":" + blockstateId);
             }
         }
+        LOGGER.info("Generated flood fill for non full blocks");
+        LOGGER.info("block.50: {}", String.join(" ", floodFillIgnoreEntries.get(50)));
+        LOGGER.info("block.51: {}", String.join(" ", floodFillIgnoreEntries.get(51)));
+        LOGGER.info("block.52: {}", String.join(" ", floodFillIgnoreEntries.get(52)));
+        LOGGER.info("block.53: {}", String.join(" ", floodFillIgnoreEntries.get(53)));
     }
     public static HashMap<Double, Integer> volume2entry = new HashMap<>(Map.of(
             .0, 50,
@@ -55,10 +65,7 @@ public class FloodFill {
     // TODO: Rework this system so if a blockstate with selected properties is supported, return the blockstate with other properties
 
     @SuppressWarnings("rawtypes")
-    private boolean isBlockstateSupported(String modId, String blockstate, Map<String, Comparable> properties) {
-        return alreadySupportedBlockstates.get(modId).get(blockstate).contains(properties);
-    }
-    private boolean isBlockstateSupported(String modId, String blockstate) {
-        return alreadySupportedBlockstates.get(modId).containsKey(blockstate);
+    private static List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId) {
+        return new ArrayList<>();
     }
 }
