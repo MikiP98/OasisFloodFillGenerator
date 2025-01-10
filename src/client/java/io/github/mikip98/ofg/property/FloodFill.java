@@ -17,7 +17,7 @@ public class FloodFill {
     Map<Short, List<String>> floodFillColourItemEntries = new HashMap<>();
 
     // occlusion category entries; 0, 0.25, 0.50, 0.75; 1 is just ignored
-    Map<Integer, List<String>> floodFillIgnoreEntries = new HashMap<>();
+    Map<Integer, Map<String, List<String>>> floodFillIgnoreEntries = new HashMap<>();
 
 
     @SuppressWarnings("rawtypes")
@@ -45,14 +45,26 @@ public class FloodFill {
                 if (volume == 1.0) continue;
 
                 Integer occlusionEntryId = volume2entry.get(volume);
-                floodFillIgnoreEntries.computeIfAbsent(occlusionEntryId, k -> new ArrayList<>()).add(modId + ":" + blockstateId);
+                floodFillIgnoreEntries.computeIfAbsent(occlusionEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
             }
         }
         LOGGER.info("Generated flood fill for non full blocks");
-        LOGGER.info("block.50: {}", String.join(" ", floodFillIgnoreEntries.get(50)));
-        LOGGER.info("block.51: {}", String.join(" ", floodFillIgnoreEntries.get(51)));
-        LOGGER.info("block.52: {}", String.join(" ", floodFillIgnoreEntries.get(52)));
-        LOGGER.info("block.53: {}", String.join(" ", floodFillIgnoreEntries.get(53)));
+        LOGGER.info("block.50 = {}", prepareMessage(floodFillIgnoreEntries.get(50)));
+        LOGGER.info("block.51 = {}", prepareMessage(floodFillIgnoreEntries.get(51)));
+        LOGGER.info("block.52 = {}", prepareMessage(floodFillIgnoreEntries.get(52)));
+        LOGGER.info("block.53 = {}", prepareMessage(floodFillIgnoreEntries.get(53)));
+    }
+    private static String prepareMessage(Map<String, List<String>> floodFillIgnoreEntry) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Map.Entry<String, List<String>> entry : floodFillIgnoreEntry.entrySet()) {
+            String modId = entry.getKey();
+            List<String> blockstateIds = entry.getValue();
+
+            stringBuilder.append(String.join(" ", blockstateIds.stream().map(blockstateId -> modId + ":" + blockstateId).toList())).append(" \\\n ");
+        }
+
+        return stringBuilder.delete(stringBuilder.length() - 4, stringBuilder.length()).toString();
     }
     public static HashMap<Double, Integer> volume2entry = new HashMap<>(Map.of(
             .0, 50,
