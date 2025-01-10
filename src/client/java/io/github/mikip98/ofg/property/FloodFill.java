@@ -1,6 +1,10 @@
 package io.github.mikip98.ofg.property;
 
+import io.github.mikip98.del.api.ColorExtractionAPI;
+import io.github.mikip98.del.structures.ColorRGBA;
+import io.github.mikip98.del.structures.ColorReturn;
 import io.github.mikip98.del.structures.SimplifiedProperty;
+import io.github.mikip98.ofg.structures.FloodFillColor;
 
 import java.util.*;
 
@@ -10,11 +14,19 @@ public class FloodFill {
     // ModId -> BlockstateId -> Set of Property value pairs
     @SuppressWarnings("rawtypes")
     Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates = new HashMap<>();
+    // If 'Set<Map<SimplifiedProperty, Comparable>>' is 'null', all the blockstates property combinations are already supported
 
 
-    // Auto FloodFill format color -> all the blockstates w properties entries
-    Map<Short, List<String>> floodFillColourBlockEntries = new HashMap<>();
-    Map<Short, List<String>> floodFillColourItemEntries = new HashMap<>();
+    // Auto FloodFill format color -> ModId -> all the blockstates w properties entries
+    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat1BlockEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
+    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat2BlockEntries = new HashMap<>(); // 0 MMMR RRGG GBBB
+    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat3BlockEntries = new HashMap<>(); // 1 RRRR GGGG BBBB
+
+    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat1ItemEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
+    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat2ItemEntries = new HashMap<>(); // 0 MMMR RRGG GBBB
+    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat3ItemEntries = new HashMap<>(); // 1 RRRR GGGG BBBB
+
+    Map<Short, Map<String, List<String>>> floodFillTranslucentEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
 
     // occlusion category entries; 0, 0.25, 0.50, 0.75; 1 is just ignored
     Map<Integer, Map<String, List<String>>> floodFillIgnoreEntries = new HashMap<>();
@@ -26,7 +38,27 @@ public class FloodFill {
     }
 
     public void generateFloodfillForTranslucentBlocks(Map<String, List<String>> translucentBlocksData) {
+        for (Map.Entry<String, List<String>> translucentBlocksDataEntry : translucentBlocksData.entrySet()) {
+            String modId = translucentBlocksDataEntry.getKey();
+            List<String> blockstateIds = translucentBlocksDataEntry.getValue();
 
+            for (String blockstateId : blockstateIds) {
+                ColorReturn colorReturn = ColorExtractionAPI.getAverageColorForBlockstate(modId, blockstateId);
+                if (colorReturn == null) continue;
+
+                List<String> blockstatesWProperties = getUnsupportedBlockstatesOfBlockstate(modId, blockstateId);
+                if (blockstatesWProperties.isEmpty()) continue;
+
+                ColorRGBA color = colorReturn.color_avg;
+//                color.multiply(1 - color.a);
+
+                FloodFillColor floodFillColor = new FloodFillColor(color);
+
+                for (String blockstateWProperties : blockstatesWProperties) {
+
+                }
+            }
+        }
     }
 
     public void generateFloodfillForNonFullBlocks(Map<String, Map<String, Double>> nonFullBlocksData) {
@@ -36,23 +68,28 @@ public class FloodFill {
 
             for (Map.Entry<String, Double> blockEntry : blocksData.entrySet()) {
                 String blockstateId = blockEntry.getKey();
-//                if (isBlockstateSupported(modId, blockstateId)) continue; // TODO: Bring this back
+                List<String> blockstatesWProperties = getUnsupportedBlockstatesOfBlockstate(modId, blockstateId);
+                if (blockstatesWProperties.isEmpty()) continue;
+
                 Double volume = blockEntry.getValue();
 
                 // Round volume to either of the categories: 0, 0.25, 0.5, 0.75, 1
                 // If not 1 add to floodFillIgnoreEntries, if 1 continue
                 volume = Math.round(volume * 4) / 4.0d;
                 if (volume == 1.0) continue;
-
                 Integer occlusionEntryId = volume2entry.get(volume);
-                floodFillIgnoreEntries.computeIfAbsent(occlusionEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
+
+                for (String blockstateWProperties : blockstatesWProperties) {
+                    floodFillIgnoreEntries.computeIfAbsent(occlusionEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+                }
             }
         }
+        int entryId = Util.floodFillIgnoreFirstEntryId;
         LOGGER.info("Generated flood fill for non full blocks");
-        LOGGER.info("block.50 = {}", prepareMessage(floodFillIgnoreEntries.get(50)));
-        LOGGER.info("block.51 = {}", prepareMessage(floodFillIgnoreEntries.get(51)));
-        LOGGER.info("block.52 = {}", prepareMessage(floodFillIgnoreEntries.get(52)));
-        LOGGER.info("block.53 = {}", prepareMessage(floodFillIgnoreEntries.get(53)));
+        LOGGER.info("block.{} = {}", entryId++, prepareMessage(floodFillIgnoreEntries.get(50)));
+        LOGGER.info("block.{} = {}", entryId++, prepareMessage(floodFillIgnoreEntries.get(51)));
+        LOGGER.info("block.{} = {}", entryId++, prepareMessage(floodFillIgnoreEntries.get(52)));
+        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(53)));
     }
     private static String prepareMessage(Map<String, List<String>> floodFillIgnoreEntry) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -74,10 +111,25 @@ public class FloodFill {
     ));
 
 
-    // TODO: Rework this system so if a blockstate with selected properties is supported, return the blockstate with other properties
+    private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId) {
+        return getUnsupportedBlockstatesOfBlockstate(modId, blockstateId, true);
+    }
+    private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId, boolean updateSupportedBlockstates) {
+        // {blockstateId}:{property1Name}={property2Value}:{property2Name}={property2Value}...
+        List<String> unsupportedBlockstatesWProperties = new ArrayList<>();
 
-    @SuppressWarnings("rawtypes")
-    private static List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId) {
-        return new ArrayList<>();
+        if (alreadySupportedBlockstates.containsKey(modId) && alreadySupportedBlockstates.get(modId).containsKey(blockstateId)) {
+            // If 'null', all the blockstates property combinations are already supported
+            if (alreadySupportedBlockstates.get(modId).get(blockstateId) != null) {
+                // TODO: Add the missing logic
+            }
+        } else {
+            unsupportedBlockstatesWProperties.add(blockstateId);
+        }
+
+        if (updateSupportedBlockstates) {
+            alreadySupportedBlockstates.computeIfAbsent(modId, k -> new HashMap<>()).put(blockstateId, null);
+        }
+        return unsupportedBlockstatesWProperties;
     }
 }
