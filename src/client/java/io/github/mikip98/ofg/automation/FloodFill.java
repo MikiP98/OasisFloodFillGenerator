@@ -1,4 +1,4 @@
-package io.github.mikip98.ofg.property;
+package io.github.mikip98.ofg.automation;
 
 import io.github.mikip98.del.api.ColorExtractionAPI;
 import io.github.mikip98.del.enums.AVGTypes;
@@ -17,7 +17,7 @@ public class FloodFill {
     // ModId -> BlockstateId -> Set of Property value pairs
     @SuppressWarnings("rawtypes")
     Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates = new HashMap<>();
-    // If 'Set<Map<SimplifiedProperty, Comparable>>' is 'null', all the blockstates property combinations are already supported
+    // If 'Set<Map<SimplifiedProperty, Comparable>>' is 'null', all the blockstates automation combinations are already supported
 
 
     // Auto FloodFill format color -> ModId -> all the blockstates w properties entries
@@ -195,9 +195,18 @@ public class FloodFill {
         List<String> unsupportedBlockstatesWProperties = new ArrayList<>();
 
         if (alreadySupportedBlockstates.containsKey(modId) && alreadySupportedBlockstates.get(modId).containsKey(blockstateId)) {
-            // If 'null', all the blockstates property combinations are already supported
+            // If 'null', all the blockstates automation combinations are already supported
             if (alreadySupportedBlockstates.get(modId).get(blockstateId) != null) {
-                // TODO: Add the missing logic
+                for (Map<SimplifiedProperty, Comparable> propertySet : propertySets) {
+                    if (!alreadySupportedBlockstates.get(modId).get(blockstateId).contains(propertySet)) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.append(blockstateId);
+                        for (Map.Entry<SimplifiedProperty, Comparable> propertyEntry : propertySet.entrySet()) {
+                            stringBuilder.append(":").append(propertyEntry.getKey().name).append("=").append(propertyEntry.getValue());
+                        }
+                        unsupportedBlockstatesWProperties.add(stringBuilder.toString());
+                    }
+                }
             }
         } else {
 //            unsupportedBlockstatesWProperties.add(blockstateId);
@@ -232,7 +241,7 @@ public class FloodFill {
         List<String> unsupportedBlockstatesWProperties = new ArrayList<>();
 
         if (alreadySupportedBlockstates.containsKey(modId) && alreadySupportedBlockstates.get(modId).containsKey(blockstateId)) {
-            // If 'null', all the blockstates property combinations are already supported
+            // If 'null', all the blockstates automation combinations are already supported
             if (alreadySupportedBlockstates.get(modId).get(blockstateId) != null) {
                 // TODO: Add the missing logic
             }

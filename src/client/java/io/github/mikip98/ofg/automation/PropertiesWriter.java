@@ -1,4 +1,4 @@
-package io.github.mikip98.ofg.property;
+package io.github.mikip98.ofg.automation;
 
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
-import static io.github.mikip98.ofg.property.FloodFill.prepareMessage;
+import static io.github.mikip98.ofg.automation.FloodFill.prepareMessage;
 
 public class PropertiesWriter {
 

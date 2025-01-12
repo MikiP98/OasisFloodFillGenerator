@@ -1,4 +1,4 @@
-package io.github.mikip98.ofg.property;
+package io.github.mikip98.ofg.automation;
 
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;

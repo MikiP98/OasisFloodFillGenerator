@@ -1,4 +1,4 @@
-package io.github.mikip98.ofg.property;
+package io.github.mikip98.ofg.automation;
 
 public class Util {
     public static short autoFloodFillMinValue = 512;

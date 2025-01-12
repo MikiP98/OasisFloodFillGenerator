@@ -4,9 +4,9 @@ import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.SimplifiedProperty;
-import io.github.mikip98.ofg.property.FloodFill;
-import io.github.mikip98.ofg.property.PropertiesReader;
-import io.github.mikip98.ofg.property.PropertiesWriter;
+import io.github.mikip98.ofg.automation.FloodFill;
+import io.github.mikip98.ofg.automation.PropertiesReader;
+import io.github.mikip98.ofg.automation.PropertiesWriter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -19,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class OasisFloodFillGeneratorClient implements ClientModInitializer {
@@ -118,7 +117,7 @@ public class OasisFloodFillGeneratorClient implements ClientModInitializer {
 		return alreadySupportedBlockstates;
 	}
 
-	// TODO: Replace with fullPropertyMap, by iterating through every block's default blockstate property set
+	// TODO: Replace with fullPropertyMap, by iterating through every block's default blockstate automation set
 	@SuppressWarnings("rawtypes")
 	private static @NotNull Map<String, SimplifiedProperty> getKnownPropertyMap(Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocksData) {
 		Map<String, SimplifiedProperty> propertyMap = new HashMap<>();
