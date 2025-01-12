@@ -27,7 +27,6 @@ package io.github.mikip98.ofg.structures;
 // 0 -> required bit 0
 
 import io.github.mikip98.del.structures.ColorRGBA;
-import io.github.mikip98.ofg.property.FloodFill;
 
 public class FloodFillColor {
     public byte b3r, b3g, b3b;  // 3 bit colors
@@ -68,7 +67,7 @@ public class FloodFillColor {
     }
 
 
-    public int getEntryId(FloodFillFormat format) {
+    public short getEntryId(FloodFillFormat format) {
         switch (format) {
             case X2048:
                 // 0MMR RRGG GBBB
@@ -85,7 +84,7 @@ public class FloodFillColor {
                 b3b  &= 0b111; // 3 bits
 
                 // Combine the values into a single int
-                return (mode << 9) | (b3r << 6) | (b3g << 3) | b3b;
+                return (short) ((mode << 9) | (b3r << 6) | (b3g << 3) | b3b);
 
             case X8192:
                 // 1 RRRR GGGG BBBB
@@ -96,7 +95,7 @@ public class FloodFillColor {
                 b4b &= 0b1111; // 4 bits
 
                 // Combine the values into a single int
-                return (b4r << 8) | (b4g << 4) | (b4b);
+                return (short) ((b4r << 8) | (b4g << 4) | (b4b));
 
             default:
                 throw new IllegalArgumentException("Unknown format: " + format);
