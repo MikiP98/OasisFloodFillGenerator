@@ -22,12 +22,12 @@ public class FloodFill {
 
     // Auto FloodFill format color -> ModId -> all the blockstates w properties entries
     public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat1BlockEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
-//    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat2BlockEntries = new HashMap<>(); // 0 MMMR RRGG GBBB
-//    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat3BlockEntries = new HashMap<>(); // 1 RRRR GGGG BBBB
+    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat2BlockEntries = new HashMap<>(); // 0 MMMR RRGG GBBB
+//    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat3BlockEntries = new HashMap<>(); // 1 RRRR GGGG BBBB
 
     public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat1ItemEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
-//    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat2ItemEntries = new HashMap<>(); // 0 MMMR RRGG GBBB
-//    Map<Short, Map<String, List<String>>> floodFillEmissiveFormat3ItemEntries = new HashMap<>(); // 1 RRRR GGGG BBBB
+    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat2ItemEntries = new HashMap<>(); // 0 MMMR RRGG GBBB
+//    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat3ItemEntries = new HashMap<>(); // 1 RRRR GGGG BBBB
 
     public Map<Short, Map<String, List<String>>> floodFillTranslucentEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
 
@@ -57,7 +57,7 @@ public class FloodFill {
                 ColorRGBA color = colorReturn.color_avg;
 
                 FloodFillColor floodFillColor = new FloodFillColor(color, blockstateWrapper.defaultEmission);
-                floodFillEmissiveFormat1ItemEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X2048), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
+                floodFillEmissiveFormat1ItemEntries.computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
 //                floodFillEmissiveFormat2ItemEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X4096), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
 //                floodFillEmissiveFormat3ItemEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X8192), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
 
@@ -73,7 +73,7 @@ public class FloodFill {
                     floodFillColor = new FloodFillColor(color, lightLevel);
 
                     for (String blockstateWProperties : blockstatesWProperties) {
-                        floodFillEmissiveFormat1BlockEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X2048), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+                        floodFillEmissiveFormat1BlockEntries.computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
 //                        floodFillEmissiveFormat2BlockEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X4096), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
 //                        floodFillEmissiveFormat3BlockEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X8192), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
                     }
@@ -103,7 +103,7 @@ public class FloodFill {
                 FloodFillColor floodFillColor = new FloodFillColor(color);
 
                 for (String blockstateWProperties : blockstatesWProperties) {
-                    floodFillTranslucentEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X2048), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+                    floodFillTranslucentEntries.computeIfAbsent(floodFillColor.getTintData(), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
                 }
             }
         }

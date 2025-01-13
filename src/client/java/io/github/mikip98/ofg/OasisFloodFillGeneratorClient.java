@@ -5,8 +5,8 @@ import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.ofg.automation.FloodFill;
-import io.github.mikip98.ofg.automation.PropertiesReader;
-import io.github.mikip98.ofg.automation.PropertiesWriter;
+import io.github.mikip98.ofg.automation.dot_properties_handlers.PropertiesReader;
+import io.github.mikip98.ofg.automation.dot_properties_handlers.PropertiesWriter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -74,7 +74,9 @@ public class OasisFloodFillGeneratorClient implements ClientModInitializer {
 
 		PropertiesWriter.writeToProperties(
 				floodFill.floodFillEmissiveFormat1BlockEntries,
+				floodFill.floodFillEmissiveFormat2BlockEntries,
 				floodFill.floodFillEmissiveFormat1ItemEntries,
+				floodFill.floodFillEmissiveFormat2ItemEntries,
 				floodFill.floodFillTranslucentEntries,
 				floodFill.floodFillIgnoreEntries
 		);
