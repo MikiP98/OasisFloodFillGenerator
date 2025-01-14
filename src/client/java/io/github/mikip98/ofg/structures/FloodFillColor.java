@@ -112,7 +112,7 @@ public class FloodFillColor {
         byte G = (byte) Math.round(color.g * 15);
         byte B = (byte) Math.round(color.b * 7);
 
-        return (short) ((0b11 << 10) | (G << 7) | (R << 4) | B);
+        return (short) ((0b11 << 10) | (G << 6) | (R << 3) | B);
     }
 
 

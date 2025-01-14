@@ -71,9 +71,10 @@ public class FloodFill {
                     if (blockstatesWProperties.isEmpty()) continue;
 
                     floodFillColor = new FloodFillColor(color, lightLevel);
+                    short emissiveDataHSV = floodFillColor.getEmissiveDataModeHSV();
 
                     for (String blockstateWProperties : blockstatesWProperties) {
-                        floodFillEmissiveFormat1BlockEntries.computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+                        floodFillEmissiveFormat1BlockEntries.computeIfAbsent(emissiveDataHSV, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
 //                        floodFillEmissiveFormat2BlockEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X4096), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
 //                        floodFillEmissiveFormat3BlockEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X8192), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
                     }
@@ -101,9 +102,10 @@ public class FloodFill {
 //                color.multiply(1 - color.a);
 
                 FloodFillColor floodFillColor = new FloodFillColor(color);
+                short tintData = floodFillColor.getTintData();
 
                 for (String blockstateWProperties : blockstatesWProperties) {
-                    floodFillTranslucentEntries.computeIfAbsent(floodFillColor.getTintData(), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+                    floodFillTranslucentEntries.computeIfAbsent(tintData, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
                 }
             }
         }
