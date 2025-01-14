@@ -7,7 +7,6 @@ import io.github.mikip98.del.structures.ColorRGBA;
 import io.github.mikip98.del.structures.ColorReturn;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.ofg.structures.FloodFillColor;
-import io.github.mikip98.ofg.structures.FloodFillFormat;
 
 import java.util.*;
 
@@ -16,18 +15,14 @@ import static io.github.mikip98.ofg.OasisFloodFillGeneratorClient.LOGGER;
 public class FloodFill {
     // ModId -> BlockstateId -> Set of Property value pairs
     @SuppressWarnings("rawtypes")
-    Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates = new HashMap<>();
+    Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates;
     // If 'Set<Map<SimplifiedProperty, Comparable>>' is 'null', all the blockstates automation combinations are already supported
 
 
     // Auto FloodFill format color -> ModId -> all the blockstates w properties entries
-    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat1BlockEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
-    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat2BlockEntries = new HashMap<>(); // 0 MMMR RRGG GBBB
-//    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat3BlockEntries = new HashMap<>(); // 1 RRRR GGGG BBBB
+    public Map<Short, Map<String, List<String>>> floodFillEmissiveBlockEntries = new HashMap<>();
 
-    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat1ItemEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
-    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat2ItemEntries = new HashMap<>(); // 0 MMMR RRGG GBBB
-//    public Map<Short, Map<String, List<String>>> floodFillEmissiveFormat3ItemEntries = new HashMap<>(); // 1 RRRR GGGG BBBB
+    public Map<Short, Map<String, List<String>>> floodFillEmissiveItemEntries = new HashMap<>();
 
     public Map<Short, Map<String, List<String>>> floodFillTranslucentEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
 
@@ -35,7 +30,6 @@ public class FloodFill {
     public Map<Short, Map<String, List<String>>> floodFillIgnoreEntries = new HashMap<>();
 
 
-    public FloodFill() {}
     @SuppressWarnings("rawtypes")
     public FloodFill(Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates) {
         this.alreadySupportedBlockstates = alreadySupportedBlockstates;
@@ -57,9 +51,7 @@ public class FloodFill {
                 ColorRGBA color = colorReturn.color_avg;
 
                 FloodFillColor floodFillColor = new FloodFillColor(color, blockstateWrapper.defaultEmission);
-                floodFillEmissiveFormat1ItemEntries.computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
-//                floodFillEmissiveFormat2ItemEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X4096), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
-//                floodFillEmissiveFormat3ItemEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X8192), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
+                floodFillEmissiveItemEntries.computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
 
                 Map<Byte, Set<Map<SimplifiedProperty, Comparable>>> propertiesData = blocksDataEntry.getValue();
 
@@ -73,10 +65,12 @@ public class FloodFill {
                     floodFillColor = new FloodFillColor(color, lightLevel);
                     short emissiveDataHSV = floodFillColor.getEmissiveDataModeHSV();
 
+                    if (blockstateId.equals("orange_lamp")) {
+                        LOGGER.info("orange_lamp; Color: {}; EmissiveData: {}", color, emissiveDataHSV);
+                    }
+
                     for (String blockstateWProperties : blockstatesWProperties) {
-                        floodFillEmissiveFormat1BlockEntries.computeIfAbsent(emissiveDataHSV, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
-//                        floodFillEmissiveFormat2BlockEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X4096), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
-//                        floodFillEmissiveFormat3BlockEntries.computeIfAbsent(floodFillColor.getEntryId(FloodFillFormat.X8192), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+                        floodFillEmissiveBlockEntries.computeIfAbsent(emissiveDataHSV, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
                     }
                 }
             }
@@ -149,32 +143,6 @@ public class FloodFill {
             List<String> blockstateIds = entry.getValue();
 
             stringBuilder.append(String.join(" ", blockstateIds.stream().map(blockstateId -> modId + ":" + blockstateId).toList())).append(" \\\n ");
-        }
-
-        return stringBuilder.delete(stringBuilder.length() - 4, stringBuilder.length()).toString();
-    }
-    @SuppressWarnings("rawtypes")
-    public static String prepareFullMessage(Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> floodFillIgnoreEntry) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (Map.Entry<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> entry : floodFillIgnoreEntry.entrySet()) {
-            String modId = entry.getKey();
-            Map<String, Set<Map<SimplifiedProperty, Comparable>>> blockstateData = entry.getValue();
-
-            for (Map.Entry<String, Set<Map<SimplifiedProperty, Comparable>>> blockstateEntry : blockstateData.entrySet()) {
-                String blockstateId = blockstateEntry.getKey();
-                Set<Map<SimplifiedProperty, Comparable>> propertySets = blockstateEntry.getValue();
-
-                for (Map<SimplifiedProperty, Comparable> propertySet : propertySets) {
-                    stringBuilder.append(modId).append(":").append(blockstateId);
-
-                    for (Map.Entry<SimplifiedProperty, Comparable> propertyEntry : propertySet.entrySet()) {
-                        stringBuilder.append(":").append(propertyEntry.getKey().name).append("=").append(propertyEntry.getValue());
-                    }
-                    stringBuilder.append(" ");
-                }
-            }
-            stringBuilder.append(" \\\n ");
         }
 
         return stringBuilder.delete(stringBuilder.length() - 4, stringBuilder.length()).toString();

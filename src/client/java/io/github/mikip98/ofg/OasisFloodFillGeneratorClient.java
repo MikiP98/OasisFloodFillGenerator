@@ -73,10 +73,8 @@ public class OasisFloodFillGeneratorClient implements ClientModInitializer {
 		floodFill.generateFloodfillForNonFullBlocks(nonFullBlocksData);
 
 		PropertiesWriter.writeToProperties(
-				floodFill.floodFillEmissiveFormat1BlockEntries,
-				floodFill.floodFillEmissiveFormat2BlockEntries,
-				floodFill.floodFillEmissiveFormat1ItemEntries,
-				floodFill.floodFillEmissiveFormat2ItemEntries,
+				floodFill.floodFillEmissiveBlockEntries,
+				floodFill.floodFillEmissiveItemEntries,
 				floodFill.floodFillTranslucentEntries,
 				floodFill.floodFillIgnoreEntries
 		);
