@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
-import static io.github.mikip98.ofg.automation.FloodFill.prepareMessage;
 
 public class PropertiesWriter {
 
@@ -94,5 +93,18 @@ public class PropertiesWriter {
         } catch (IOException e) {
             LOGGER.error("Error while writing properties file", e);
         }
+    }
+    public static String prepareMessage(Map<String, List<String>> floodFillIgnoreEntry) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        List<String> modIds = new ArrayList<>(floodFillIgnoreEntry.keySet());
+        Collections.sort(modIds);
+
+        for (String modId : modIds) {
+            List<String> blockstateIds = floodFillIgnoreEntry.get(modId);
+            stringBuilder.append(String.join(" ", blockstateIds.stream().map(blockstateId -> modId + ":" + blockstateId).toList())).append(" \\\n ");
+        }
+
+        return stringBuilder.delete(stringBuilder.length() - 4, stringBuilder.length()).toString();
     }
 }

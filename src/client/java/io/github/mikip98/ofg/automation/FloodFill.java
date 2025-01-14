@@ -75,6 +75,7 @@ public class FloodFill {
                 }
             }
         }
+        LOGGER.info("Generated flood fill for light emitting blocks");
     }
 
     public void generateFloodfillForTranslucentBlocks(Map<String, List<String>> translucentBlocksData) {
@@ -103,9 +104,12 @@ public class FloodFill {
                 }
             }
         }
+        LOGGER.info("Generated flood fill for translucent blocks");
     }
 
     public void generateFloodfillForNonFullBlocks(Map<String, Map<String, Double>> nonFullBlocksData) {
+        HashMap<Double, Short> volume2entry = generateVolume2entry();
+
         for (Map.Entry<String, Map<String, Double>> nonFullBlocksDataEntry : nonFullBlocksData.entrySet()) {
             String modId = nonFullBlocksDataEntry.getKey();
             Map<String, Double> blocksData = nonFullBlocksDataEntry.getValue();
@@ -115,13 +119,13 @@ public class FloodFill {
                 List<String> blockstatesWProperties = getUnsupportedBlockstatesOfBlockstate(modId, blockstateId);
                 if (blockstatesWProperties.isEmpty()) continue;
 
-                Double volume = blockEntry.getValue();
+                double volume = blockEntry.getValue();
 
                 // Round volume to either of the categories: 0, 0.25, 0.5, 0.75, 1
-                // If not 1 add to floodFillIgnoreEntries, if 1 continue
-                volume = Math.round(volume * 4) / 4.0d;
-                if (volume == 1.0) continue;
-                Short occlusionEntryId = volume2entry.get(volume);
+                // If not 1 add to floodFillIgnoreEntries, if 1 or above continue
+                volume = (double) Math.round(volume * Util.floodFillIgnoreEntryCount) / Util.floodFillIgnoreEntryCount;
+                if (volume >= 1.0) continue;
+                short occlusionEntryId = volume2entry.get(volume);
 
                 for (String blockstateWProperties : blockstatesWProperties) {
                     floodFillIgnoreEntries.computeIfAbsent(occlusionEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
@@ -130,29 +134,25 @@ public class FloodFill {
         }
         short entryId = Util.floodFillIgnoreFirstEntryId;
         LOGGER.info("Generated flood fill for non full blocks");
-        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
-        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
-        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
-        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId)));
+//        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
+//        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
+//        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
+//        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId)));
     }
-    public static String prepareMessage(Map<String, List<String>> floodFillIgnoreEntry) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (Map.Entry<String, List<String>> entry : floodFillIgnoreEntry.entrySet()) {
-            String modId = entry.getKey();
-            List<String> blockstateIds = entry.getValue();
-
-            stringBuilder.append(String.join(" ", blockstateIds.stream().map(blockstateId -> modId + ":" + blockstateId).toList())).append(" \\\n ");
+    private static HashMap<Double, Short> generateVolume2entry() {
+        HashMap<Double, Short> volume2entry = new HashMap<>();
+        for (int i = 0; i < Util.floodFillIgnoreEntryCount; i++) {
+            double volume = (double) i / Util.floodFillIgnoreEntryCount;
+            volume2entry.put(volume, (short) (Util.floodFillIgnoreFirstEntryId + i));
         }
-
-        return stringBuilder.delete(stringBuilder.length() - 4, stringBuilder.length()).toString();
+        return volume2entry;
     }
-    public static HashMap<Double, Short> volume2entry = new HashMap<>(Map.of(
-            .0, (short) 50,
-            0.25, (short) 51,
-            0.5, (short) 52,
-            0.75, (short) 53
-    ));
+//    public static HashMap<Double, Short> volume2entry = new HashMap<>(Map.of(
+//            0.0, (short) 50,
+//            0.25, (short) 51,
+//            0.5, (short) 52,
+//            0.75, (short) 53
+//    ));
 
 
     @SuppressWarnings("rawtypes")
