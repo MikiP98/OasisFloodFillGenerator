@@ -1,5 +1,6 @@
 package io.github.mikip98.ofg.automation.dot_properties_handlers;
 
+import io.github.mikip98.ofg.automation.Util;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
@@ -7,10 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
@@ -32,6 +30,12 @@ public class PropertiesWriter {
             LOGGER.error("Error while creating config directory", e);
         }
 
+        Set<String> ignoreFloodfillIds = new HashSet<>();
+        for (int i = 0; i < Util.floodFillIgnoreEntryCount; i++) {
+            ignoreFloodfillIds.add(String.valueOf(Util.floodFillIgnoreFirstEntryId + i));
+        }
+        Set<Character> numbers = new HashSet<>(Arrays.asList('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
+
         try (Stream<Path> paths = Files.list(configPath)) {
             paths.filter(file -> file.toString().endsWith(".properties")).forEach(propertiesPath -> {
                 // Write the properties file
@@ -39,8 +43,29 @@ public class PropertiesWriter {
 
                 try(BufferedReader br = new BufferedReader(new FileReader(propertiesPath.toString()))) {
                     String line;
+                    short entryId = Util.floodFillIgnoreFirstEntryId;
+                    boolean isEntryFloodfillIgnore = false;
                     while ((line = br.readLine()) != null) {
-                        new_properties.append(line).append("\n");
+                        if (
+                                line.strip().length() > 6 + String.valueOf(Util.floodFillIgnoreFirstEntryId).length()
+                                && ignoreFloodfillIds.contains(line.strip().substring(6, 6 + String.valueOf(Util.floodFillIgnoreFirstEntryId).length()))
+                                && !numbers.contains(line.strip().charAt(6 + String.valueOf(Util.floodFillIgnoreFirstEntryId).length()))
+                        ) isEntryFloodfillIgnore = true;
+
+                        new_properties.append(line);
+
+                        if (isEntryFloodfillIgnore && !line.strip().endsWith("\\")) {
+                            new_properties.append(" \\\n");
+                            new_properties.append(" #ifdef AUTO_GENERATED_FLOODFILL\n");
+
+                            new_properties.append(' ').append(prepareMessage(floodFillIgnoreEntries.get(entryId)));
+
+                            new_properties.append("\n #endif");
+                            entryId++;
+                            isEntryFloodfillIgnore = false;
+                        }
+
+                        new_properties.append("\n");
                     }
                 } catch (IOException e) {
                     LOGGER.error("Error while reading properties file", e);
@@ -73,16 +98,16 @@ public class PropertiesWriter {
 
                 new_properties.append("\n#endif\n");
 
-                new_properties.append("\n# Ignored by Floodfill\n");
-                entryIds = new ArrayList<>(floodFillIgnoreEntries.keySet());
+//                new_properties.append("\n# Ignored by Floodfill\n");
+//                entryIds = new ArrayList<>(floodFillIgnoreEntries.keySet());
 //                Collections.sort(entryIds);
-                for (Short entryId : entryIds) {
-                    new_properties
-                            .append("block.").append(entryId)
-                            .append(" = ")
-                            .append(prepareMessage(floodFillIgnoreEntries.get(entryId)))
-                            .append("\n");
-                }
+//                for (Short entryId : entryIds) {
+//                    new_properties
+//                            .append("block.").append(entryId)
+//                            .append(" = ")
+//                            .append(prepareMessage(floodFillIgnoreEntries.get(entryId)))
+//                            .append("\n");
+//                }
 
                 try {
                     Files.write(propertiesPath, new_properties.toString().getBytes());
