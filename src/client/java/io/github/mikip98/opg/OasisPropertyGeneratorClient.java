@@ -1,12 +1,13 @@
-package io.github.mikip98.ofg;
+package io.github.mikip98.opg;
 
 import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.SimplifiedProperty;
-import io.github.mikip98.ofg.automation.FloodFill;
-import io.github.mikip98.ofg.automation.dot_properties_handlers.PropertiesReader;
-import io.github.mikip98.ofg.automation.dot_properties_handlers.PropertiesWriter;
+import io.github.mikip98.del.structures.VolumeData;
+import io.github.mikip98.opg.automation.floodfill.FloodFill;
+import io.github.mikip98.opg.automation.io.PropertiesReader;
+import io.github.mikip98.opg.automation.io.PropertiesWriter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -19,10 +20,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static io.github.mikip98.opg.automation.sss.SSS.generateSSS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-public class OasisFloodFillGeneratorClient implements ClientModInitializer {
-	public static final String MOD_ID = "oasis-floodfill-generator";
+public class OasisPropertyGeneratorClient implements ClientModInitializer {
+	public static final String MOD_ID = "oasis-property-generator";
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -32,10 +34,10 @@ public class OasisFloodFillGeneratorClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
-		LOGGER.info("Oasis FloodFill Generator is coloring the world!");
+		LOGGER.info("Oasis Property Generator is coloring the world!");
 
 		// Create the config directory if it doesn't exist
-		Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-floodfill-generator");
+		Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-property-generator");
 		try {
 			Files.createDirectories(configPath);
 		} catch (IOException e) {
@@ -43,11 +45,15 @@ public class OasisFloodFillGeneratorClient implements ClientModInitializer {
 		}
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-				dispatcher.register(literal("generate_floodfill")
-						.executes(context -> {
+				dispatcher.register(literal("generate")
+						.then(literal("floodfill").executes(context -> {
 							generateFloodFill();
 							return 0;
-						})
+						}))
+						.then(literal("SSS").executes(context -> {
+							generateSSS();
+							return 0;
+						}))
 				)
 		);
 	}
@@ -64,7 +70,8 @@ public class OasisFloodFillGeneratorClient implements ClientModInitializer {
 		Map<String, List<String>> translucentBlocksData = BlockstatesAPI.getTranslucentBlockNames();
 
 		// ModId -> BlockstateId -> block volume
-		Map<String, Map<String, Double>> nonFullBlocksData = BlockstatesAPI.getNonFullBlocks();
+		VolumeData volumeData = BlockstatesAPI.getNonFullBlocks();
+		Map<String, Map<String, Double>> nonFullBlocksData = volumeData.knownNonFullBlocksData;
 
 		FloodFill floodFill = new FloodFill(getAlreadySupportedBlockstates(getKnownPropertyMap(lightEmittingBlocksData)));
 

@@ -1,4 +1,4 @@
-package io.github.mikip98.ofg.mixin.client;
+package io.github.mikip98.opg.mixin.client;
 
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;

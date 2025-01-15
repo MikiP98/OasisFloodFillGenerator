@@ -1,6 +1,6 @@
-package io.github.mikip98.ofg.automation.dot_properties_handlers;
+package io.github.mikip98.opg.automation.io;
 
-import io.github.mikip98.ofg.automation.Util;
+import io.github.mikip98.opg.automation.Util;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
@@ -21,7 +21,7 @@ public class PropertiesWriter {
             Map<Short, Map<String, List<String>>> floodFillTranslucentEntries,
             Map<Short, Map<String, List<String>>> floodFillIgnoreEntries
     ) {
-        Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-floodfill-generator");
+        Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-property-generator");
 
         // Create the config directory if it doesn't exist
         try {

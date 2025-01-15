@@ -1,4 +1,4 @@
-package io.github.mikip98.ofg.automation;
+package io.github.mikip98.opg.automation.floodfill;
 
 import io.github.mikip98.del.api.ColorExtractionAPI;
 import io.github.mikip98.del.enums.AVGTypes;
@@ -6,11 +6,12 @@ import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.ColorRGBA;
 import io.github.mikip98.del.structures.ColorReturn;
 import io.github.mikip98.del.structures.SimplifiedProperty;
-import io.github.mikip98.ofg.structures.FloodFillColor;
+import io.github.mikip98.opg.automation.Util;
+import io.github.mikip98.opg.structures.FloodFillColor;
 
 import java.util.*;
 
-import static io.github.mikip98.ofg.OasisFloodFillGeneratorClient.LOGGER;
+import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
 
 public class FloodFill {
     // ModId -> BlockstateId -> Set of Property value pairs
@@ -132,12 +133,7 @@ public class FloodFill {
                 }
             }
         }
-        short entryId = Util.floodFillIgnoreFirstEntryId;
         LOGGER.info("Generated flood fill for non full blocks");
-//        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
-//        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
-//        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId++)));
-//        LOGGER.info("block.{} = {}", entryId, prepareMessage(floodFillIgnoreEntries.get(entryId)));
     }
     private static HashMap<Double, Short> generateVolume2entry() {
         HashMap<Double, Short> volume2entry = new HashMap<>();
@@ -147,12 +143,6 @@ public class FloodFill {
         }
         return volume2entry;
     }
-//    public static HashMap<Double, Short> volume2entry = new HashMap<>(Map.of(
-//            0.0, (short) 50,
-//            0.25, (short) 51,
-//            0.5, (short) 52,
-//            0.75, (short) 53
-//    ));
 
 
     @SuppressWarnings("rawtypes")

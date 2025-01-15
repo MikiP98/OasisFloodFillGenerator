@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "io.github.mikip98.ofg.mixin.client",
+	"package": "io.github.mikip98.opg.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
 		"ExampleClientMixin"

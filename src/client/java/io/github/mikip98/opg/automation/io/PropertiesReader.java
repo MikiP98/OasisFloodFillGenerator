@@ -1,4 +1,4 @@
-package io.github.mikip98.ofg.automation.dot_properties_handlers;
+package io.github.mikip98.opg.automation.io;
 
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public class PropertiesReader {
     }
     @SuppressWarnings("rawtypes")
     public static @NotNull Map<String, Map<String, Set<Map<String, Comparable>>>> getAlreadySupportedBlockstatesWIds(boolean ignoreAutoFloodFillEntries) {
-        Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-floodfill-generator");
+        Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-property-generator");
 
         // Create the config directory if it doesn't exist
         try {
