@@ -3,6 +3,8 @@ package io.github.mikip98.ofg.automation.dot_properties_handlers;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,12 +31,23 @@ public class PropertiesReader {
             LOGGER.error("Error while creating config directory", e);
         }
 
+        Map<String, Map<String, Set<Map<String, Comparable>>>> alreadySupportedBlockstatesWIds = new HashMap<>();
         Path blockPropertiesPath = configPath.resolve("block.properties");
-
         if (Files.exists(blockPropertiesPath)) {
             // Parse the properties file to get the already supported blockstates
+            try (BufferedReader br = new BufferedReader(new FileReader(String.valueOf(blockPropertiesPath)))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    line = line.strip();
+                    if (line.startsWith("block.") || line.startsWith("item.")) {
+
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error while reading block.properties", e);
+            }
         }
 
-        return new HashMap<>();
+        return alreadySupportedBlockstatesWIds;
     }
 }
