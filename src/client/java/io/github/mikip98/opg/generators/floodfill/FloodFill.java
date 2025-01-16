@@ -32,7 +32,10 @@ public class FloodFill {
 
 
     @SuppressWarnings("rawtypes")
-    public FloodFill(Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates) {
+    public FloodFill(
+            Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates,
+            Map<String, Long> newSupportStats
+    ) {
         this.alreadySupportedBlockstates = alreadySupportedBlockstates;
     }
 

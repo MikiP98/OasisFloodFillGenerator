@@ -22,12 +22,7 @@
 			"io.github.mikip98.opg.OasisPropertyGeneratorClient"
 		]
 	},
-	"mixins": [
-		{
-			"config": "oasis-property-generator.client.mixins.json",
-			"environment": "client"
-		}
-	],
+	"mixins": [],
 	"depends": {
 		"fabricloader": ">=0.16.9",
 		"minecraft": "~1.20",

@@ -49,13 +49,11 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 						.then(literal("floodfill").executes(context -> {
 							Thread thread = new Thread(OasisPropertyGeneratorClient::generateFloodFill);
 							thread.start();
-//							generateFloodFill();
 							return 0;
 						}))
 						.then(literal("SSS").executes(context -> {
 							Thread thread = new Thread(SSS::generateSSS);
 							thread.start();
-//							generateSSS();
 							return 0;
 						}))
 				)
@@ -77,18 +75,18 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		VolumeData volumeData = BlockstatesAPI.getNonFullBlocks();
 		Map<String, Map<String, Double>> nonFullBlocksData = volumeData.knownNonFullBlocksData;
 
-		FloodFill floodFill = new FloodFill(getAlreadySupportedBlockstates(getKnownPropertyMap(lightEmittingBlocksData)));
-
-		floodFill.generateFloodfillForLightEmittingBlocks(lightEmittingBlocksData);
-		floodFill.generateFloodfillForTranslucentBlocks(translucentBlocksData);
-		floodFill.generateFloodfillForNonFullBlocks(nonFullBlocksData);
-
-		PropertiesWriter.writeToProperties(
-				floodFill.floodFillEmissiveBlockEntries,
-				floodFill.floodFillEmissiveItemEntries,
-				floodFill.floodFillTranslucentEntries,
-				floodFill.floodFillIgnoreEntries
-		);
+//		FloodFill floodFill = new FloodFill(getAlreadySupportedBlockstates(getKnownPropertyMap(lightEmittingBlocksData)));
+//
+//		floodFill.generateFloodfillForLightEmittingBlocks(lightEmittingBlocksData);
+//		floodFill.generateFloodfillForTranslucentBlocks(translucentBlocksData);
+//		floodFill.generateFloodfillForNonFullBlocks(nonFullBlocksData);
+//
+//		PropertiesWriter.writeToProperties(
+//				floodFill.floodFillEmissiveBlockEntries,
+//				floodFill.floodFillEmissiveItemEntries,
+//				floodFill.floodFillTranslucentEntries,
+//				floodFill.floodFillIgnoreEntries
+//		);
 	}
 
 	@SuppressWarnings("rawtypes")
