@@ -1,6 +1,6 @@
-package io.github.mikip98.opg.automation;
+package io.github.mikip98.opg.config;
 
-public class Util {
+public class Config {
     public static short autoFloodFillMinValue = 512;
     public static short autoFloodFillMaxValue = 8191;
 

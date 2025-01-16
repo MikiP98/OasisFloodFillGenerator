@@ -1,4 +1,4 @@
-package io.github.mikip98.opg.automation.floodfill;
+package io.github.mikip98.opg.generators.floodfill;
 
 import io.github.mikip98.del.api.ColorExtractionAPI;
 import io.github.mikip98.del.enums.AVGTypes;
@@ -6,7 +6,7 @@ import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.ColorRGBA;
 import io.github.mikip98.del.structures.ColorReturn;
 import io.github.mikip98.del.structures.SimplifiedProperty;
-import io.github.mikip98.opg.automation.Util;
+import io.github.mikip98.opg.config.Config;
 import io.github.mikip98.opg.structures.FloodFillColor;
 
 import java.util.*;
@@ -124,7 +124,7 @@ public class FloodFill {
 
                 // Round volume to either of the categories: 0, 0.25, 0.5, 0.75, 1
                 // If not 1 add to floodFillIgnoreEntries, if 1 or above continue
-                volume = (double) Math.round(volume * Util.floodFillIgnoreEntryCount) / Util.floodFillIgnoreEntryCount;
+                volume = (double) Math.round(volume * Config.floodFillIgnoreEntryCount) / Config.floodFillIgnoreEntryCount;
                 if (volume >= 1.0) continue;
                 short occlusionEntryId = volume2entry.get(volume);
 
@@ -137,9 +137,9 @@ public class FloodFill {
     }
     private static HashMap<Double, Short> generateVolume2entry() {
         HashMap<Double, Short> volume2entry = new HashMap<>();
-        for (int i = 0; i < Util.floodFillIgnoreEntryCount; i++) {
-            double volume = (double) i / Util.floodFillIgnoreEntryCount;
-            volume2entry.put(volume, (short) (Util.floodFillIgnoreFirstEntryId + i));
+        for (int i = 0; i < Config.floodFillIgnoreEntryCount; i++) {
+            double volume = (double) i / Config.floodFillIgnoreEntryCount;
+            volume2entry.put(volume, (short) (Config.floodFillIgnoreFirstEntryId + i));
         }
         return volume2entry;
     }

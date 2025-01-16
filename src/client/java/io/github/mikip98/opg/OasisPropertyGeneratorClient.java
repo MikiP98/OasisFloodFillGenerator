@@ -5,9 +5,10 @@ import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.del.structures.VolumeData;
-import io.github.mikip98.opg.automation.floodfill.FloodFill;
-import io.github.mikip98.opg.automation.io.PropertiesReader;
-import io.github.mikip98.opg.automation.io.PropertiesWriter;
+import io.github.mikip98.opg.generators.floodfill.FloodFill;
+import io.github.mikip98.opg.io.PropertiesReader;
+import io.github.mikip98.opg.io.PropertiesWriter;
+import io.github.mikip98.opg.generators.sss.SSS;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -20,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static io.github.mikip98.opg.automation.sss.SSS.generateSSS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class OasisPropertyGeneratorClient implements ClientModInitializer {
@@ -47,11 +47,15 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 				dispatcher.register(literal("generate")
 						.then(literal("floodfill").executes(context -> {
-							generateFloodFill();
+							Thread thread = new Thread(OasisPropertyGeneratorClient::generateFloodFill);
+							thread.start();
+//							generateFloodFill();
 							return 0;
 						}))
 						.then(literal("SSS").executes(context -> {
-							generateSSS();
+							Thread thread = new Thread(SSS::generateSSS);
+							thread.start();
+//							generateSSS();
 							return 0;
 						}))
 				)
