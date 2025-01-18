@@ -5,6 +5,7 @@ import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.del.structures.VolumeData;
+import io.github.mikip98.opg.generators.Controller;
 import io.github.mikip98.opg.generators.floodfill.FloodFill;
 import io.github.mikip98.opg.io.PropertiesReader;
 import io.github.mikip98.opg.io.PropertiesWriter;
@@ -51,11 +52,11 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 							thread.start();
 							return 0;
 						}))
-						.then(literal("SSS").executes(context -> {
-							Thread thread = new Thread(SSS::generateSSS);
-							thread.start();
-							return 0;
-						}))
+//						.then(literal("SSS").executes(context -> {
+//							Thread thread = new Thread(SSS::generateSSS);
+//							thread.start();
+//							return 0;
+//						}))
 				)
 		);
 	}
@@ -65,15 +66,28 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		LOGGER.info("Generating flood fill");
 		CacheAPI.cachePathsIfNotCached();
 
-		// ModId -> BlockstateId -> Light level -> Set of Property value pairs
-		Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocksData = BlockstatesAPI.getLightEmittingBlocksData();
+//		// ModId -> BlockstateId -> Light level -> Set of Property value pairs
+//		Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocksData = BlockstatesAPI.getLightEmittingBlocksData();
+//
+//		// ModId -> List of BlockstateIds
+//		Map<String, List<String>> translucentBlocksData = BlockstatesAPI.getTranslucentBlockNames();
+//
+//		// ModId -> BlockstateId -> block volume
+//		VolumeData volumeData = BlockstatesAPI.getNonFullBlocks();
+//		Map<String, Map<String, Double>> nonFullBlocksData = volumeData.knownNonFullBlocksData;
 
-		// ModId -> List of BlockstateIds
-		Map<String, List<String>> translucentBlocksData = BlockstatesAPI.getTranslucentBlockNames();
 
-		// ModId -> BlockstateId -> block volume
-		VolumeData volumeData = BlockstatesAPI.getNonFullBlocks();
-		Map<String, Map<String, Double>> nonFullBlocksData = volumeData.knownNonFullBlocksData;
+//		final List<Runnable> pipeline = List.of(
+//				this::generateFloodFillEmissiveEntries,
+//				this::generateFloodFillTranslucentEntries,
+//				this::generateSSS,
+//				this::generateFloodFillIgnoreEntries
+//		);
+//
+//		Controller controller = new Controller(getAlreadySupportedBlockstates(getKnownPropertyMap(lightEmittingBlocksData)));
+//		FloodFill floodFill = new FloodFill(controller);
+//
+//		SSS.generateSSS(controller);
 
 //		FloodFill floodFill = new FloodFill(getAlreadySupportedBlockstates(getKnownPropertyMap(lightEmittingBlocksData)));
 //

@@ -1,5 +1,6 @@
 package io.github.mikip98.opg.generators.floodfill;
 
+import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.del.api.ColorExtractionAPI;
 import io.github.mikip98.del.enums.AVGTypes;
 import io.github.mikip98.del.structures.BlockstateWrapper;
@@ -7,6 +8,7 @@ import io.github.mikip98.del.structures.ColorRGBA;
 import io.github.mikip98.del.structures.ColorReturn;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.opg.config.Config;
+import io.github.mikip98.opg.generators.Controller;
 import io.github.mikip98.opg.structures.FloodFillColor;
 
 import java.util.*;
@@ -14,11 +16,8 @@ import java.util.*;
 import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
 
 public class FloodFill {
-    // ModId -> BlockstateId -> Set of Property value pairs
-    @SuppressWarnings("rawtypes")
-    Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates;
-    // If 'Set<Map<SimplifiedProperty, Comparable>>' is 'null', all the blockstates automation combinations are already supported
 
+    protected final Controller controller;
 
     // Auto FloodFill format color -> ModId -> all the blockstates w properties entries
     public Map<Short, Map<String, List<String>>> floodFillEmissiveBlockEntries = new HashMap<>();
@@ -32,16 +31,15 @@ public class FloodFill {
 
 
     @SuppressWarnings("rawtypes")
-    public FloodFill(
-            Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates,
-            Map<String, Long> newSupportStats
-    ) {
-        this.alreadySupportedBlockstates = alreadySupportedBlockstates;
+    public FloodFill(Controller controller) {
+        this.controller = controller;
     }
 
 
     @SuppressWarnings("rawtypes")
-    public void generateFloodfillForLightEmittingBlocks(Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocksData) {
+    public void generateFloodfillForLightEmittingBlocks() {
+        Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocksData = BlockstatesAPI.getLightEmittingBlocksData();
+
         for (Map.Entry<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocksDataEntry : lightEmittingBlocksData.entrySet()) {
             String modId = lightEmittingBlocksDataEntry.getKey();
             Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>> blocksData = lightEmittingBlocksDataEntry.getValue();
@@ -199,22 +197,22 @@ public class FloodFill {
     private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId) {
         return getUnsupportedBlockstatesOfBlockstate(modId, blockstateId, true);
     }
-    private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId, boolean updateSupportedBlockstates) {
-        // {blockstateId}:{property1Name}={property2Value}:{property2Name}={property2Value}...
-        List<String> unsupportedBlockstatesWProperties = new ArrayList<>();
-
-        if (alreadySupportedBlockstates.containsKey(modId) && alreadySupportedBlockstates.get(modId).containsKey(blockstateId)) {
-            // If 'null', all the blockstates automation combinations are already supported
-            if (alreadySupportedBlockstates.get(modId).get(blockstateId) != null) {
-                // TODO: Add the missing logic
-            }
-        } else {
-            unsupportedBlockstatesWProperties.add(blockstateId);
-        }
-
-        if (updateSupportedBlockstates) {
-            alreadySupportedBlockstates.computeIfAbsent(modId, k -> new HashMap<>()).put(blockstateId, null);
-        }
-        return unsupportedBlockstatesWProperties;
-    }
+//    private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId, boolean updateSupportedBlockstates) {
+//        // {blockstateId}:{property1Name}={property2Value}:{property2Name}={property2Value}...
+//        List<String> unsupportedBlockstatesWProperties = new ArrayList<>();
+//
+//        if (alreadySupportedBlockstates.containsKey(modId) && alreadySupportedBlockstates.get(modId).containsKey(blockstateId)) {
+//            // If 'null', all the blockstates automation combinations are already supported
+//            if (alreadySupportedBlockstates.get(modId).get(blockstateId) != null) {
+//                // TODO: Add the missing logic
+//            }
+//        } else {
+//            unsupportedBlockstatesWProperties.add(blockstateId);
+//        }
+//
+//        if (updateSupportedBlockstates) {
+//            alreadySupportedBlockstates.computeIfAbsent(modId, k -> new HashMap<>()).put(blockstateId, null);
+//        }
+//        return unsupportedBlockstatesWProperties;
+//    }
 }

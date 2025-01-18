@@ -6,7 +6,7 @@ import io.github.mikip98.opg.generators.sss.SSS;
 
 import java.util.*;
 
-public class Sticher {
+public class MainGenerator {
 
     protected final List<Runnable> pipeline = List.of(
             this::generateFloodFillEmissiveEntries,
@@ -15,20 +15,16 @@ public class Sticher {
             this::generateFloodFillIgnoreEntries
     );
 
-
-    @SuppressWarnings("rawtypes")
-    protected final Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates;
+    protected final Controller controller;
     protected final FloodFill floodFill;
-    protected final SSS sss;
-    public Map<String, Long> newSupportStats = new HashMap<>();
 
 
     @SuppressWarnings("rawtypes")
-    public Sticher(Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates) {
-        this.alreadySupportedBlockstates = alreadySupportedBlockstates;
-        this.floodFill = new FloodFill(alreadySupportedBlockstates, newSupportStats);
-        this.sss = new SSS(alreadySupportedBlockstates, newSupportStats);
+    public MainGenerator(Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates) {
+        this.controller = new Controller(alreadySupportedBlockstates);
+        this.floodFill = new FloodFill(controller);
     }
+
 
     public void run() {
         pipeline.forEach(Runnable::run);
@@ -36,7 +32,7 @@ public class Sticher {
 
 
     protected void generateFloodFillEmissiveEntries() {
-
+        floodFill.generateFloodfillForLightEmittingBlocks();
     }
 
     protected void generateFloodFillTranslucentEntries() {
@@ -48,6 +44,6 @@ public class Sticher {
     }
 
     protected void generateSSS() {
-
+        SSS.generateSSS(controller);
     }
 }
