@@ -6,6 +6,7 @@ import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.del.structures.VolumeData;
 import io.github.mikip98.opg.generators.Controller;
+import io.github.mikip98.opg.generators.MainGenerator;
 import io.github.mikip98.opg.generators.floodfill.FloodFill;
 import io.github.mikip98.opg.io.PropertiesReader;
 import io.github.mikip98.opg.io.PropertiesWriter;
@@ -47,16 +48,25 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 				dispatcher.register(literal("generate")
-						.then(literal("floodfill").executes(context -> {
-							Thread thread = new Thread(OasisPropertyGeneratorClient::generateFloodFill);
+						.then(literal("all").executes(context -> {
+							Thread thread = new Thread(
+									() -> {
+										MainGenerator mainGenerator = new MainGenerator();
+									}
+							);
 							thread.start();
 							return 0;
 						}))
-//						.then(literal("SSS").executes(context -> {
-//							Thread thread = new Thread(SSS::generateSSS);
-//							thread.start();
-//							return 0;
-//						}))
+						.then(literal("SSS").executes(context -> {
+							Thread thread = new Thread();
+							thread.start();
+							return 0;
+						}))
+						.then(literal("FloodFill")
+								.then(literal("FloodFill").executes(context -> {
+									return 0;
+								}))
+						)
 				)
 		);
 	}

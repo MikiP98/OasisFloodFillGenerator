@@ -1,5 +1,6 @@
 package io.github.mikip98.opg.generators;
 
+import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.opg.generators.floodfill.FloodFill;
 import io.github.mikip98.opg.generators.sss.SSS;
@@ -20,7 +21,10 @@ public class MainGenerator {
 
 
     @SuppressWarnings("rawtypes")
-    public MainGenerator(Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates) {
+    public MainGenerator() {
+        CacheAPI.cachePathsIfNotCached();
+        Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates = null;
+
         this.controller = new Controller(alreadySupportedBlockstates);
         this.floodFill = new FloodFill(controller);
     }
@@ -36,11 +40,11 @@ public class MainGenerator {
     }
 
     protected void generateFloodFillTranslucentEntries() {
-
+        floodFill.generateFloodfillForTranslucentBlocks();
     }
 
     protected void generateFloodFillIgnoreEntries() {
-
+        floodFill.generateFloodfillForNonFullBlocks();
     }
 
     protected void generateSSS() {
