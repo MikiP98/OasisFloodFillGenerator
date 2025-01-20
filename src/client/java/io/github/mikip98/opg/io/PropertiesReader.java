@@ -1,5 +1,6 @@
 package io.github.mikip98.opg.io;
 
+import io.github.mikip98.opg.structures.DotPropertiesInfo;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,11 +18,11 @@ import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
 public class PropertiesReader {
 
     @SuppressWarnings("rawtypes")
-    public static Map<String, Map<String, Set<Map<String, Comparable>>>> getAlreadySupportedBlockstatesWIds() {
+    public static Map<String, Map<String, Set<Map<String, String>>>> getAlreadySupportedBlockstatesWIds() {
         return getAlreadySupportedBlockstatesWIds(true);
     }
     @SuppressWarnings("rawtypes")
-    public static @NotNull Map<String, Map<String, Set<Map<String, Comparable>>>> getAlreadySupportedBlockstatesWIds(boolean ignoreAutoFloodFillEntries) {
+    public static @NotNull DotPropertiesInfo getDotPropertiesInfo() {
         Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-property-generator");
 
         // Create the config directory if it doesn't exist
@@ -31,7 +32,7 @@ public class PropertiesReader {
             LOGGER.error("Error while creating config directory", e);
         }
 
-        Map<String, Map<String, Set<Map<String, Comparable>>>> alreadySupportedBlockstatesWIds = new HashMap<>();
+        Map<String, Map<String, Set<Map<String, String>>>> alreadySupportedBlockstatesWIds = new HashMap<>();
         Path blockPropertiesPath = configPath.resolve("block.properties");
         if (Files.exists(blockPropertiesPath)) {
             // Parse the properties file to get the already supported blockstates
@@ -48,6 +49,7 @@ public class PropertiesReader {
             }
         }
 
-        return alreadySupportedBlockstatesWIds;
+//        return alreadySupportedBlockstatesWIds;
+        return new DotPropertiesInfo(alreadySupportedBlockstatesWIds, e);
     }
 }
