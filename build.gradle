@@ -44,7 +44,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Main library
-	modImplementation files('libs/data-extraction-library-1.0.0-rc3.jar')
+	modImplementation files('libs/data-extraction-library-1.0.0-rc5.jar')
 }
 
 processResources {
