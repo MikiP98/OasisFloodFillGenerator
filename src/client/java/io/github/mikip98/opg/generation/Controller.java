@@ -1,4 +1,4 @@
-package io.github.mikip98.opg.generators;
+package io.github.mikip98.opg.generation;
 
 import io.github.mikip98.del.structures.SimplifiedProperty;
 

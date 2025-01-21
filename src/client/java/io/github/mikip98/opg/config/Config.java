@@ -7,24 +7,28 @@ import java.util.Map;
 
 public class Config {
 
-    // FLOOD FILL
+    // --- PIPELINE ---
+    // Pipeline is currently located in 'src/client/java/io/github/mikip98/opg/generators/MainGenerator.java'
+
+
+    // --- FLOOD FILL ---
 
     // Boundaries for Auto FloodFill colors support, used if '#ifdef AUTO_GENERATED_FLOODFILL' is not found  TODO: implement
-    public static short autoFloodFillMinValue = 512;
-    public static short autoFloodFillMaxValue = 8191;
+    public static final short autoFloodFillMinValue = 512;
+    public static final short autoFloodFillMaxValue = 8191;
 
-    public static short floodFillIgnoreFirstEntryId = 50;
-    public static byte floodFillIgnoreEntryCount = 4;
+    public static final short floodFillIgnoreFirstEntryId = 50;
+    public static final byte floodFillIgnoreEntryCount = 4;
     // Main FloodFill ignore entries will be calculated in the following way:
     // 1.0 / floodFillIgnoreEntryCount = IgnoreDelta
     // Entry: (floodFillIgnoreFirstEntryId)      ->  occlusion: (0.0)
     // Entry: (floodFillIgnoreFirstEntryId + 1)  ->  occlusion: (IgnoreDelta)
     // Entry: (floodFillIgnoreFirstEntryId + 2)  ->  occlusion: (IgnoreDelta * 2)
     // ...
-    // Entry: (floodFillIgnoreFirstEntryId + floodFillIgnoreEntryCount - 1)  ->  occlusion: 1.0 - IgnoreDelta
+    // Entry: (floodFillIgnoreFirstEntryId + floodFillIgnoreEntryCount - 1)  ->  occlusion: (1.0 - IgnoreDelta)
 
 
-    // SSS
+    // --- SSS ---
 
     public static final Map<SSSTypes, Short> SSSCategory2EntryId = Map.of(
             SSSTypes.TALL_PLANT_LOWER,  (short) 13,  // TallPlantBlock.class
@@ -43,5 +47,7 @@ public class Config {
             MushroomPlantBlock.class,       SSSTypes.WEAK,
             AbstractBannerBlock.class,      SSSTypes.WEAK_3,
             GrassBlock.class,               SSSTypes.GRASS
+            // 'TallPlantBlock.class' is not included as it's type is both 'SSSTypes.TALL_PLANT_LOWER' and 'SSSTypes.TALL_PLANT_UPPER'
+            // Because of that it can't be configured right now
     );
 }

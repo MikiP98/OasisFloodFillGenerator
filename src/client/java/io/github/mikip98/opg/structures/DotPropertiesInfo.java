@@ -11,12 +11,12 @@ public class DotPropertiesInfo {
     @SuppressWarnings("rawtypes")
     public Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> nativelySupportedBlockstates;
     // ModId -> BlockstateId -> Set of Property value pairs
-    public Map<Short, Map<String, List<String>>> existingAutoSupport;
+    public AutoSupport existingAutoSupport;
 
     @SuppressWarnings("rawtypes")
     public DotPropertiesInfo(
             Map<String, Map<String, Set<Map<String, String>>>> nativelySupportedBlockstatesWPropertyStrings,
-            Map<Short, Map<String, List<String>>> existingAutoSupport
+            AutoSupport existingAutoSupport
     ) {
         this.existingAutoSupport = existingAutoSupport;
 

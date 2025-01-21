@@ -1,14 +1,14 @@
-package io.github.mikip98.opg.generators.sss;
+package io.github.mikip98.opg.generation.sss;
 
 import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.opg.config.Config;
 import io.github.mikip98.opg.enums.SSSTypes;
-import io.github.mikip98.opg.generators.Controller;
+import io.github.mikip98.opg.generation.Controller;
 import net.minecraft.block.*;
 
 import java.util.*;
 
-public class SSS {
+public class SSSGenerator {
 
     public static Map<Short, Map<String, List<String>>> generateSSS(Controller controller) {
         final Set<Class<?>> classesOfInterest = Set.of(

@@ -1,4 +1,4 @@
-package io.github.mikip98.opg.generators.floodfill;
+package io.github.mikip98.opg.generation.floodfill;
 
 import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.del.api.ColorExtractionAPI;
@@ -8,30 +8,34 @@ import io.github.mikip98.del.structures.ColorRGBA;
 import io.github.mikip98.del.structures.ColorReturn;
 import io.github.mikip98.del.structures.SimplifiedProperty;
 import io.github.mikip98.opg.config.Config;
-import io.github.mikip98.opg.generators.Controller;
+import io.github.mikip98.opg.generation.Controller;
 import io.github.mikip98.opg.structures.FloodFillColor;
+import io.github.mikip98.opg.structures.FloodFillSupport;
 
 import java.util.*;
 
 import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
 
-public class FloodFill {
+public class FloodFillGenerator {
 
     protected final Controller controller;
 
-    // Auto FloodFill format color -> ModId -> all the blockstates w properties entries
-    public Map<Short, Map<String, List<String>>> floodFillEmissiveBlockEntries = new HashMap<>();
+//    // Auto FloodFill format color -> ModId -> all the blockstates w properties entries
+//    public Map<Short, Map<String, List<String>>> floodFillEmissiveBlockEntries = new HashMap<>();
+//
+//    public Map<Short, Map<String, List<String>>> floodFillEmissiveItemEntries = new HashMap<>();
+//
+//    public Map<Short, Map<String, List<String>>> floodFillTranslucentEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
+//
+//    // occlusion category entries; 0, 0.25, 0.50, 0.75; 1 is just ignored
+//    public Map<Short, Map<String, List<String>>> floodFillIgnoreEntries = new HashMap<>();
 
-    public Map<Short, Map<String, List<String>>> floodFillEmissiveItemEntries = new HashMap<>();
-
-    public Map<Short, Map<String, List<String>>> floodFillTranslucentEntries = new HashMap<>(); // 0 0MMR RRGG GBBB
-
-    // occlusion category entries; 0, 0.25, 0.50, 0.75; 1 is just ignored
-    public Map<Short, Map<String, List<String>>> floodFillIgnoreEntries = new HashMap<>();
+    public FloodFillSupport floodFillSupport;
 
 
-    public FloodFill(Controller controller) {
+    public FloodFillGenerator(Controller controller) {
         this.controller = controller;
+        this.floodFillSupport = new FloodFillSupport();
     }
 
 

@@ -1,9 +1,9 @@
-package io.github.mikip98.opg.generators;
+package io.github.mikip98.opg.generation;
 
 import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.del.structures.SimplifiedProperty;
-import io.github.mikip98.opg.generators.floodfill.FloodFill;
-import io.github.mikip98.opg.generators.sss.SSS;
+import io.github.mikip98.opg.generation.floodfill.FloodFillGenerator;
+import io.github.mikip98.opg.generation.sss.SSSGenerator;
 
 import java.util.*;
 
@@ -12,12 +12,13 @@ public class MainGenerator {
     protected final List<Runnable> pipeline = List.of(
             this::generateFloodFillEmissiveEntries,
             this::generateFloodFillTranslucentEntries,
+            // this::generateFloodFillSpecialEntries,
             this::generateSSS,
-            this::generateFloodFillIgnoreEntries
+            this::generateFloodFillIgnoreEntries  // Main entries
     );
 
     protected final Controller controller;
-    protected final FloodFill floodFill;
+    protected final FloodFillGenerator floodFillGenerator;
 
 
     @SuppressWarnings("rawtypes")
@@ -26,7 +27,7 @@ public class MainGenerator {
         Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates = null;
 
         this.controller = new Controller(alreadySupportedBlockstates);
-        this.floodFill = new FloodFill(controller);
+        this.floodFillGenerator = new FloodFillGenerator(controller);
     }
 
 
@@ -36,18 +37,18 @@ public class MainGenerator {
 
 
     protected void generateFloodFillEmissiveEntries() {
-        floodFill.generateFloodfillForLightEmittingBlocks();
+        floodFillGenerator.generateFloodfillForLightEmittingBlocks();
     }
 
     protected void generateFloodFillTranslucentEntries() {
-        floodFill.generateFloodfillForTranslucentBlocks();
+        floodFillGenerator.generateFloodfillForTranslucentBlocks();
     }
 
     protected void generateFloodFillIgnoreEntries() {
-        floodFill.generateFloodfillForNonFullBlocks();
+        floodFillGenerator.generateFloodfillForNonFullBlocks();
     }
 
     protected void generateSSS() {
-        SSS.generateSSS(controller);
+        SSSGenerator.generateSSS(controller);
     }
 }

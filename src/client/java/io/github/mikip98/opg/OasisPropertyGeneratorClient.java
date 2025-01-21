@@ -1,16 +1,10 @@
 package io.github.mikip98.opg;
 
-import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.del.structures.BlockstateWrapper;
 import io.github.mikip98.del.structures.SimplifiedProperty;
-import io.github.mikip98.del.structures.VolumeData;
-import io.github.mikip98.opg.generators.Controller;
-import io.github.mikip98.opg.generators.MainGenerator;
-import io.github.mikip98.opg.generators.floodfill.FloodFill;
+import io.github.mikip98.opg.generation.MainGenerator;
 import io.github.mikip98.opg.io.PropertiesReader;
-import io.github.mikip98.opg.io.PropertiesWriter;
-import io.github.mikip98.opg.generators.sss.SSS;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
