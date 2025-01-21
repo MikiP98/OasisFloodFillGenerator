@@ -30,7 +30,6 @@ public class FloodFill {
     public Map<Short, Map<String, List<String>>> floodFillIgnoreEntries = new HashMap<>();
 
 
-    @SuppressWarnings("rawtypes")
     public FloodFill(Controller controller) {
         this.controller = controller;
     }
@@ -80,7 +79,9 @@ public class FloodFill {
         LOGGER.info("Generated flood fill for light emitting blocks");
     }
 
-    public void generateFloodfillForTranslucentBlocks(Map<String, List<String>> translucentBlocksData) {
+    public void generateFloodfillForTranslucentBlocks() {
+        Map<String, List<String>> translucentBlocksData = BlockstatesAPI.getTranslucentBlockNames();
+
         for (Map.Entry<String, List<String>> translucentBlocksDataEntry : translucentBlocksData.entrySet()) {
             String modId = translucentBlocksDataEntry.getKey();
             List<String> blockstateIds = translucentBlocksDataEntry.getValue();
@@ -89,7 +90,7 @@ public class FloodFill {
                 ColorReturn colorReturn = ColorExtractionAPI.getAverageColorForBlockstate(modId, blockstateId, AVGTypes.ARITHMETIC);
                 if (colorReturn == null) continue;
 
-                List<String> blockstatesWProperties = getUnsupportedBlockstatesOfBlockstate(modId, blockstateId);
+                List<String> blockstatesWProperties = controller.getNotSupportedBlockstates(modId, blockstateId);
                 if (blockstatesWProperties.isEmpty()) continue;
 
                 ColorRGBA color = colorReturn.color_avg;
@@ -109,7 +110,9 @@ public class FloodFill {
         LOGGER.info("Generated flood fill for translucent blocks");
     }
 
-    public void generateFloodfillForNonFullBlocks(Map<String, Map<String, Double>> nonFullBlocksData) {
+    public void generateFloodfillForNonFullBlocks() {
+        Map<String, Map<String, Double>> nonFullBlocksData = BlockstatesAPI.getNonFullBlocks().knownNonFullBlocksData;
+
         HashMap<Double, Short> volume2entry = generateVolume2entry();
 
         for (Map.Entry<String, Map<String, Double>> nonFullBlocksDataEntry : nonFullBlocksData.entrySet()) {
@@ -118,7 +121,7 @@ public class FloodFill {
 
             for (Map.Entry<String, Double> blockEntry : blocksData.entrySet()) {
                 String blockstateId = blockEntry.getKey();
-                List<String> blockstatesWProperties = getUnsupportedBlockstatesOfBlockstate(modId, blockstateId);
+                List<String> blockstatesWProperties = controller.getNotSupportedBlockstates(modId, blockstateId);
                 if (blockstatesWProperties.isEmpty()) continue;
 
                 double volume = blockEntry.getValue();
@@ -136,7 +139,7 @@ public class FloodFill {
         }
         LOGGER.info("Generated flood fill for non full blocks");
     }
-    private static HashMap<Double, Short> generateVolume2entry() {
+    protected static HashMap<Double, Short> generateVolume2entry() {
         HashMap<Double, Short> volume2entry = new HashMap<>();
         for (int i = 0; i < Config.floodFillIgnoreEntryCount; i++) {
             double volume = (double) i / Config.floodFillIgnoreEntryCount;
@@ -147,72 +150,50 @@ public class FloodFill {
 
 
     @SuppressWarnings("rawtypes")
-    private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId, Set<Map<SimplifiedProperty, Comparable>> propertySets) {
+    protected List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId, Set<Map<SimplifiedProperty, Comparable>> propertySets) {
         return getUnsupportedBlockstatesOfBlockstate(modId, blockstateId, propertySets, true);
     }
     @SuppressWarnings("rawtypes")
-    private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId, Set<Map<SimplifiedProperty, Comparable>> propertySets, boolean updateSupportedBlockstates) {
+    protected List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId, Set<Map<SimplifiedProperty, Comparable>> propertySets, boolean updateSupportedBlockstates) {
         // {blockstateId}:{property1Name}={property2Value}:{property2Name}={property2Value}...
         List<String> unsupportedBlockstatesWProperties = new ArrayList<>();
 
-        if (alreadySupportedBlockstates.containsKey(modId) && alreadySupportedBlockstates.get(modId).containsKey(blockstateId)) {
-            // If 'null', all the blockstates automation combinations are already supported
-            if (alreadySupportedBlockstates.get(modId).get(blockstateId) != null) {
-                for (Map<SimplifiedProperty, Comparable> propertySet : propertySets) {
-                    if (!alreadySupportedBlockstates.get(modId).get(blockstateId).contains(propertySet)) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        stringBuilder.append(blockstateId);
-                        for (Map.Entry<SimplifiedProperty, Comparable> propertyEntry : propertySet.entrySet()) {
-                            stringBuilder.append(":").append(propertyEntry.getKey().name).append("=").append(propertyEntry.getValue());
-                        }
-                        unsupportedBlockstatesWProperties.add(stringBuilder.toString());
-                    }
-                }
-            }
-        } else {
-//            unsupportedBlockstatesWProperties.add(blockstateId);
-            for (Map<SimplifiedProperty, Comparable> propertySet : propertySets) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(blockstateId);
-                for (Map.Entry<SimplifiedProperty, Comparable> propertyEntry : propertySet.entrySet()) {
-                    stringBuilder.append(":").append(propertyEntry.getKey().name).append("=").append(propertyEntry.getValue());
-                }
-                unsupportedBlockstatesWProperties.add(stringBuilder.toString());
-            }
-        }
-
-        if (updateSupportedBlockstates) {
-            alreadySupportedBlockstates.computeIfAbsent(modId, k -> new HashMap<>());
-            Map<String, Set<Map<SimplifiedProperty, Comparable>>> modBlockstates = alreadySupportedBlockstates.get(modId);
-            if (modBlockstates.containsKey(blockstateId)) {
-                modBlockstates.get(blockstateId).addAll(propertySets);
-            } else {
-                modBlockstates.put(blockstateId, propertySets);
-            }
-            // TODO: Replace remove every unneeded simplified properties or replace with null if all possibilities are supported
-        }
-        return unsupportedBlockstatesWProperties;
-    }
-
-    private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId) {
-        return getUnsupportedBlockstatesOfBlockstate(modId, blockstateId, true);
-    }
-//    private List<String> getUnsupportedBlockstatesOfBlockstate(String modId, String blockstateId, boolean updateSupportedBlockstates) {
-//        // {blockstateId}:{property1Name}={property2Value}:{property2Name}={property2Value}...
-//        List<String> unsupportedBlockstatesWProperties = new ArrayList<>();
-//
 //        if (alreadySupportedBlockstates.containsKey(modId) && alreadySupportedBlockstates.get(modId).containsKey(blockstateId)) {
 //            // If 'null', all the blockstates automation combinations are already supported
 //            if (alreadySupportedBlockstates.get(modId).get(blockstateId) != null) {
-//                // TODO: Add the missing logic
+//                for (Map<SimplifiedProperty, Comparable> propertySet : propertySets) {
+//                    if (!alreadySupportedBlockstates.get(modId).get(blockstateId).contains(propertySet)) {
+//                        StringBuilder stringBuilder = new StringBuilder();
+//                        stringBuilder.append(blockstateId);
+//                        for (Map.Entry<SimplifiedProperty, Comparable> propertyEntry : propertySet.entrySet()) {
+//                            stringBuilder.append(":").append(propertyEntry.getKey().name).append("=").append(propertyEntry.getValue());
+//                        }
+//                        unsupportedBlockstatesWProperties.add(stringBuilder.toString());
+//                    }
+//                }
 //            }
 //        } else {
-//            unsupportedBlockstatesWProperties.add(blockstateId);
+////            unsupportedBlockstatesWProperties.add(blockstateId);
+//            for (Map<SimplifiedProperty, Comparable> propertySet : propertySets) {
+//                StringBuilder stringBuilder = new StringBuilder();
+//                stringBuilder.append(blockstateId);
+//                for (Map.Entry<SimplifiedProperty, Comparable> propertyEntry : propertySet.entrySet()) {
+//                    stringBuilder.append(":").append(propertyEntry.getKey().name).append("=").append(propertyEntry.getValue());
+//                }
+//                unsupportedBlockstatesWProperties.add(stringBuilder.toString());
+//            }
 //        }
 //
 //        if (updateSupportedBlockstates) {
-//            alreadySupportedBlockstates.computeIfAbsent(modId, k -> new HashMap<>()).put(blockstateId, null);
+//            alreadySupportedBlockstates.computeIfAbsent(modId, k -> new HashMap<>());
+//            Map<String, Set<Map<SimplifiedProperty, Comparable>>> modBlockstates = alreadySupportedBlockstates.get(modId);
+//            if (modBlockstates.containsKey(blockstateId)) {
+//                modBlockstates.get(blockstateId).addAll(propertySets);
+//            } else {
+//                modBlockstates.put(blockstateId, propertySets);
+//            }
+//            // TODO: Replace remove every unneeded simplified properties or replace with null if all possibilities are supported
 //        }
-//        return unsupportedBlockstatesWProperties;
-//    }
+        return unsupportedBlockstatesWProperties;
+    }
 }

@@ -1,6 +1,7 @@
 package io.github.mikip98.opg.generators.sss;
 
 import io.github.mikip98.del.api.BlockstatesAPI;
+import io.github.mikip98.opg.config.Config;
 import io.github.mikip98.opg.enums.SSSTypes;
 import io.github.mikip98.opg.generators.Controller;
 import net.minecraft.block.*;
@@ -9,27 +10,6 @@ import java.util.*;
 
 public class SSS {
 
-    protected static final Map<SSSTypes, Short> SSSCategory2EntryId = Map.of(
-            SSSTypes.TALL_PLANT_LOWER,  (short) 13,  // TallPlantBlock.class
-            SSSTypes.TALL_PLANT_UPPER,  (short) 14,  // TallPlantBlock.class
-            SSSTypes.GROUND_WAVING,     (short) 54,  // PlantBlock.class (- mushrooms) (- tall plants)
-            SSSTypes.AIR_WAVING,        (short) 56,  // LeavesBlock.class
-            SSSTypes.STRONG,            (short) 80,  // AbstractPlantPartBlock.class
-            SSSTypes.WEAK,              (short) 81,  // MushroomPlantBlock.class
-            SSSTypes.WEAK_3,            (short) 83,  // AbstractBannerBlock.class
-            SSSTypes.GRASS,             (short) 85   // GrassBlock.class
-    );
-    protected static final Map<Class<?>, SSSTypes> MCClass2SSSCategory = Map.of(
-            PlantBlock.class,               SSSTypes.GROUND_WAVING,
-            LeavesBlock.class,              SSSTypes.AIR_WAVING,
-            AbstractPlantPartBlock.class,   SSSTypes.STRONG,
-            MushroomPlantBlock.class,       SSSTypes.WEAK,
-            AbstractBannerBlock.class,      SSSTypes.WEAK_3,
-            GrassBlock.class,               SSSTypes.GRASS
-    );
-
-
-    @SuppressWarnings("rawtypes")
     public static Map<Short, Map<String, List<String>>> generateSSS(Controller controller) {
         final Set<Class<?>> classesOfInterest = Set.of(
                 AbstractBannerBlock.class,      // Wall and Floor Banners
@@ -96,9 +76,9 @@ public class SSS {
 
         for (Map.Entry<Class<?>, Map<String, List<String>>> entry : dataOfInterest.entrySet()) {
             Class<?> clazz = entry.getKey();
-            SSSTypes category = MCClass2SSSCategory.get(clazz);
+            SSSTypes category = Config.MCClass2SSSCategory.get(clazz);
             if (category == null) continue;
-            short entryId = SSSCategory2EntryId.get(category);
+            short entryId = Config.SSSCategory2EntryId.get(category);
             Map<String, List<String>> blockstateData = entry.getValue();
 
 //            SSSSupportEntries.computeIfAbsent(entryId, k -> new HashMap<>()).putAll(blockstateData);
@@ -108,14 +88,14 @@ public class SSS {
                 List<String> blockstateIds = entry2.getValue();
 
                 for (String blockstateId : blockstateIds) {
-                    List<String> blockstateWProperties = controller.getNotSupportedBlockstates(blockstateId);
-                    SSSSupportEntries.computeIfAbsent(entryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).addAll(blockstateId);
+                    List<String> blockstateWProperties = controller.getNotSupportedBlockstates(modId, blockstateId);
+                    SSSSupportEntries.computeIfAbsent(entryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).addAll(blockstateWProperties);
                 }
             }
         }
 
-        short tallPlantLowerEntryId = SSSCategory2EntryId.get(SSSTypes.TALL_PLANT_LOWER);
-        short tallPlantUpperEntryId = SSSCategory2EntryId.get(SSSTypes.TALL_PLANT_UPPER);
+        short tallPlantLowerEntryId = Config.SSSCategory2EntryId.get(SSSTypes.TALL_PLANT_LOWER);
+        short tallPlantUpperEntryId = Config.SSSCategory2EntryId.get(SSSTypes.TALL_PLANT_UPPER);
 
         for (Map.Entry<String, List<String>> entry : SSSSupportEntries.get(tallPlantLowerEntryId).entrySet()) {
             String modId = entry.getKey();
