@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class FloodFillSupport {
+public class FloodFillSupportIntermediate {
     // Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> has construction:
     // EntryId -> ModId -> blockstateId -> propertySet -> property -> value
 
