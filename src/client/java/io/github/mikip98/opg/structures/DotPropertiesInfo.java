@@ -8,11 +8,10 @@ import java.util.*;
 import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
 
 public class DotPropertiesInfo {
-    @SuppressWarnings("rawtypes")
-    public Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> nativelySupportedBlockstates;
     // ModId -> BlockstateId -> Set of Property value pairs
-    public Map<String, Set<String>> nativelySupportedItems;
+    public Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable<?>>>>> nativelySupportedBlockstates;
     // ModId -> list of ItemIds
+    public Map<String, Set<String>> nativelySupportedItems;
 
     public AutoSupport existingAutoSupport;
 

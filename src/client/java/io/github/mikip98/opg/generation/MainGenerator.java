@@ -1,9 +1,11 @@
 package io.github.mikip98.opg.generation;
 
-import io.github.mikip98.del.api.CacheAPI;
-import io.github.mikip98.del.structures.SimplifiedProperty;
-import io.github.mikip98.opg.generation.floodfill.FloodFillGenerator;
+import io.github.mikip98.opg.generation.floodfill.FloodFillGeneralGenerator;
+import io.github.mikip98.opg.generation.floodfill.FloodFillSpecialGenerator;
 import io.github.mikip98.opg.generation.sss.SSSGenerator;
+import io.github.mikip98.opg.structures.DotPropertiesInfo;
+import io.github.mikip98.opg.structures.FloodFillSupportIntermediate;
+import io.github.mikip98.opg.structures.SSSSupport;
 
 import java.util.*;
 
@@ -12,22 +14,20 @@ public class MainGenerator {
     protected final List<Runnable> pipeline = List.of(
             this::generateFloodFillEmissiveEntries,
             this::generateFloodFillTranslucentEntries,
-            // this::generateFloodFillSpecialEntries,
+            this::generateFloodFillSpecialEntries,
             this::generateSSS,
-            this::generateFloodFillIgnoreEntries  // Main entries
+            this::generateFloodFillMainIgnoreEntries  // Main entries
     );
 
     protected final Controller controller;
-    protected final FloodFillGenerator floodFillGenerator;
+    protected final FloodFillGeneralGenerator floodFillGeneralGenerator;
+    FloodFillSupportIntermediate SpecialFloodFillSupport;
+    SSSSupport sssSupport;
 
 
-    @SuppressWarnings("rawtypes")
-    public MainGenerator() {
-        CacheAPI.cachePathsIfNotCached();
-        Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates = null;
-
-        this.controller = new Controller(alreadySupportedBlockstates);
-        this.floodFillGenerator = new FloodFillGenerator(controller);
+    public MainGenerator(DotPropertiesInfo dotPropertiesInfo) {
+        this.controller = new Controller(dotPropertiesInfo);
+        this.floodFillGeneralGenerator = new FloodFillGeneralGenerator(controller);
     }
 
 
@@ -37,18 +37,20 @@ public class MainGenerator {
 
 
     protected void generateFloodFillEmissiveEntries() {
-        floodFillGenerator.generateFloodfillForLightEmittingBlocks();
+        floodFillGeneralGenerator.generateFloodfillForLightEmittingBlocks();
     }
 
     protected void generateFloodFillTranslucentEntries() {
-        floodFillGenerator.generateFloodfillForTranslucentBlocks();
+        floodFillGeneralGenerator.generateFloodfillForTranslucentBlocks();
     }
 
-    protected void generateFloodFillIgnoreEntries() {
-        floodFillGenerator.generateFloodfillForNonFullBlocks();
+    protected void generateFloodFillMainIgnoreEntries() {
+        floodFillGeneralGenerator.generateFloodfillForNonFullBlocks();
     }
+
+    protected void generateFloodFillSpecialEntries() { SpecialFloodFillSupport = FloodFillSpecialGenerator.generateSpecialEntries(); }
 
     protected void generateSSS() {
-        SSSGenerator.generateSSS(controller);
+        SSSSupport = SSSGenerator.generateSSS(controller);
     }
 }

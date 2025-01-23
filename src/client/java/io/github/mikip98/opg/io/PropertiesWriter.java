@@ -1,6 +1,9 @@
 package io.github.mikip98.opg.io;
 
 import io.github.mikip98.opg.config.Config;
+import io.github.mikip98.opg.structures.AutoSupport;
+import io.github.mikip98.opg.structures.FloodFillSupportIntermediate;
+import io.github.mikip98.opg.structures.SSSSupport;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
@@ -15,12 +18,10 @@ import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
 
 public class PropertiesWriter {
 
-    public static void writeToProperties(
-            Map<Short, Map<String, List<String>>> floodFillEmissiveBlockEntries,
-            Map<Short, Map<String, List<String>>> floodFillEmissiveItemEntries,
-            Map<Short, Map<String, List<String>>> floodFillTranslucentEntries,
-            Map<Short, Map<String, List<String>>> floodFillIgnoreEntries
-    ) {
+    public static void writeToProperties(AutoSupport autoSupport) {
+        FloodFillSupportIntermediate floodFillSupport = autoSupport.floodFillSupportIntermediate;
+        SSSSupport sssSupport = autoSupport.sssSupport;
+
         Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-property-generator");
 
         // Create the config directory if it doesn't exist
@@ -37,35 +38,54 @@ public class PropertiesWriter {
         Set<Character> numbers = new HashSet<>(Arrays.asList('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
 
         try (Stream<Path> paths = Files.list(configPath)) {
-            paths.filter(file -> file.toString().endsWith(".properties")).forEach(propertiesPath -> {
+            for (Path file : paths.toList()) {
+                String fileName = file.toString();
+                if (fileName.endsWith(".properties")) {
+                    if (fileName.startsWith("block.")) {
+                        // Handle 'block.properties' type file
+                    }
+                    else if (fileName.startsWith("item.")) {
+                        // Handle 'item.properties' type file
+                    }
+                }
+
                 // Write the properties file
                 StringBuilder new_properties = new StringBuilder();
 
                 try(BufferedReader br = new BufferedReader(new FileReader(propertiesPath.toString()))) {
                     String line;
-                    short entryId = Config.floodFillIgnoreFirstEntryId;
-                    boolean isEntryFloodfillIgnore = false;
+                    short entryId;
+                    short lastEntryId = -1;
+
+//                    short entryId = Config.floodFillIgnoreFirstEntryId;
+//                    boolean isEntryFloodfillIgnore = false;
                     while ((line = br.readLine()) != null) {
-                        if (
-                                line.strip().length() > 6 + String.valueOf(Config.floodFillIgnoreFirstEntryId).length()
-                                && ignoreFloodfillIds.contains(line.strip().substring(6, 6 + String.valueOf(Config.floodFillIgnoreFirstEntryId).length()))
-                                && !numbers.contains(line.strip().charAt(6 + String.valueOf(Config.floodFillIgnoreFirstEntryId).length()))
-                        ) isEntryFloodfillIgnore = true;
+                        line = line.strip().toLowerCase();
 
-                        new_properties.append(line);
+                        if (line.startsWith("block.")) {
 
-                        if (isEntryFloodfillIgnore && !line.strip().endsWith("\\")) {
-                            new_properties.append(" \\\n");
-                            new_properties.append(" #ifdef AUTO_GENERATED_FLOODFILL\n");
-
-                            new_properties.append(' ').append(prepareMessage(floodFillIgnoreEntries.get(entryId)));
-
-                            new_properties.append("\n #endif");
-                            entryId++;
-                            isEntryFloodfillIgnore = false;
                         }
 
-                        new_properties.append("\n");
+//                        if (
+//                                line.strip().length() > 6 + String.valueOf(Config.floodFillIgnoreFirstEntryId).length()
+//                                && ignoreFloodfillIds.contains(line.strip().substring(6, 6 + String.valueOf(Config.floodFillIgnoreFirstEntryId).length()))
+//                                && !numbers.contains(line.strip().charAt(6 + String.valueOf(Config.floodFillIgnoreFirstEntryId).length()))
+//                        ) isEntryFloodfillIgnore = true;
+//
+//                        new_properties.append(line);
+//
+//                        if (isEntryFloodfillIgnore && !line.strip().endsWith("\\")) {
+//                            new_properties.append(" \\\n");
+//                            new_properties.append(" #ifdef AUTO_GENERATED_FLOODFILL\n");
+//
+////                            new_properties.append(' ').append(prepareMessage(floodFillIgnoreEntries.get(entryId)));
+//
+//                            new_properties.append("\n #endif");
+//                            entryId++;
+//                            isEntryFloodfillIgnore = false;
+//                        }
+//
+//                        new_properties.append("\n");
                     }
                 } catch (IOException e) {
                     LOGGER.error("Error while reading properties file", e);
@@ -75,26 +95,26 @@ public class PropertiesWriter {
                 new_properties.append("#ifdef AUTO_GENERATED_FLOODFILL\n");
                 List<Short> entryIds;
 
-                new_properties.append("\n# Emissive\n");
-                entryIds = new ArrayList<>(floodFillEmissiveBlockEntries.keySet());
-                Collections.sort(entryIds);
-                for (Short entryId : entryIds) {
-                    new_properties
-                            .append("block.").append(entryId).append(" = ")
-                            .append(prepareMessage(floodFillEmissiveBlockEntries.get(entryId)))
-                            .append("\n");
-                }
-
-                new_properties.append("\n# Translucent\n");
-                entryIds = new ArrayList<>(floodFillTranslucentEntries.keySet());
-                Collections.sort(entryIds);
-                for (Short entryId : entryIds) {
-                    new_properties
-                            .append("block.").append(entryId)
-                            .append(" = ")
-                            .append(prepareMessage(floodFillTranslucentEntries.get(entryId)))
-                            .append("\n");
-                }
+//                new_properties.append("\n# Emissive\n");
+//                entryIds = new ArrayList<>(floodFillEmissiveBlockEntries.keySet());
+//                Collections.sort(entryIds);
+//                for (Short entryId : entryIds) {
+//                    new_properties
+//                            .append("block.").append(entryId).append(" = ")
+//                            .append(prepareMessage(floodFillEmissiveBlockEntries.get(entryId)))
+//                            .append("\n");
+//                }
+//
+//                new_properties.append("\n# Translucent\n");
+//                entryIds = new ArrayList<>(floodFillTranslucentEntries.keySet());
+//                Collections.sort(entryIds);
+//                for (Short entryId : entryIds) {
+//                    new_properties
+//                            .append("block.").append(entryId)
+//                            .append(" = ")
+//                            .append(prepareMessage(floodFillTranslucentEntries.get(entryId)))
+//                            .append("\n");
+//                }
 
                 new_properties.append("\n#endif\n");
 
@@ -114,7 +134,7 @@ public class PropertiesWriter {
                 } catch (IOException e) {
                     LOGGER.error("Error while writing properties file", e);
                 }
-            });
+            }
         } catch (IOException e) {
             LOGGER.error("Error while writing properties file", e);
         }

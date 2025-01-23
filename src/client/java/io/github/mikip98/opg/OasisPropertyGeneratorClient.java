@@ -67,8 +67,7 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		CacheAPI.cachePathsIfNotCached();
 
 		DotPropertiesInfo dotPropertiesInfo = PropertiesReader.getDotPropertiesInfo();
-
-		MainGenerator mainGenerator = new MainGenerator();
+		MainGenerator mainGenerator = new MainGenerator(dotPropertiesInfo);
 
 		PropertiesWriter.writeToProperties(null, null, null, null);
 

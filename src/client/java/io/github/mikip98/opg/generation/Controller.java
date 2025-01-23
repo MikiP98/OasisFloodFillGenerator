@@ -1,23 +1,26 @@
 package io.github.mikip98.opg.generation;
 
 import io.github.mikip98.del.structures.SimplifiedProperty;
+import io.github.mikip98.opg.structures.DotPropertiesInfo;
 
 import java.util.*;
 
 public class Controller {
 
-    @SuppressWarnings("rawtypes")
-    protected Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates;
-    // If 'Set<Map<SimplifiedProperty, Comparable>>' is 'null', all the blockstates automation combinations are already supported
     // ModId -> BlockstateId -> Set of Property value pairs
+    // If 'Set<Map<SimplifiedProperty, Comparable>>' is 'null', all the blockstates automation combinations are already supported
+    public Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable<?>>>>> alreadySupportedBlockstates;
+    // ModId -> list of ItemIds
+    public Map<String, Set<String>> alreadySupportedItems;
+
 
     public Map<String, Integer> newSupportStats = new HashMap<>();
     // ModId -> Number of supported blockstates
 
 
-    @SuppressWarnings("rawtypes")
-    public Controller(Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> alreadySupportedBlockstates) {
-        this.alreadySupportedBlockstates = alreadySupportedBlockstates;
+    public Controller(DotPropertiesInfo data) {
+        this.alreadySupportedBlockstates = data.nativelySupportedBlockstates;
+        this.alreadySupportedItems = data.nativelySupportedItems;
     }
 
 

@@ -5,35 +5,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class FloodFillSupportIntermediate {
-    // Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> has construction:
-    // EntryId -> ModId -> blockstateId -> propertySet -> property -> value
+    // General floodfill support
+    FloodFillGeneralSupport generalFloodFillSupport;
 
-    // Auto Floodfill entry data format
-    public Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> lightEmittingSupport;
-    public Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> translucentSupport;
-
-    // By default (% is occlusion): 0% -> 50; 25% -> 51; 50% -> 52; 75% -> 53
-    public Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> mainNonFullSupport;
-
-    // Map<String, Map<String, Set<Map<String, Comparable<?>>>>> has construction:
-    // ModId -> blockstateId -> propertySet -> property -> value
-
-    // Specialized non-full floodfill support
-    public Map<String, Map<String, Set<Map<String, Comparable<?>>>>> carpetSupport;    // TODO: Implement
-    public Map<String, Map<String, Set<Map<String, Comparable<?>>>>> doorSupport;      // TODO: Implement
-//    public Map<String, Map<String, Set<Map<String, Comparable<?>>>>> fenceSupport;     // TODO: Implement  // 25% ignore override?
-    public Map<String, Map<String, Set<Map<String, Comparable<?>>>>> slabSupport;      // TODO: Implement
-    public Map<String, Map<String, Set<Map<String, Comparable<?>>>>> stairSupport;     // TODO: Implement
-    public Map<String, Map<String, Set<Map<String, Comparable<?>>>>> trapdoorSupport;  // TODO: Implement
-    public Map<String, Map<String, Set<Map<String, Comparable<?>>>>> wallSupport;      // TODO: Implement
+    // Specialized floodfill support
+    FloodFillSpecialSupport specialFloodFillSupport;
 
 
 
     public @NotNull LinkedHashMap<Short, String> getLightEmittingEntries() {
-        return getStringEntriesFullSorted(lightEmittingSupport);
+        return getStringEntriesFullSorted(generalFloodFillSupport.lightEmittingSupport);
     }
     public @NotNull LinkedHashMap<Short, String> getTranslucentEntries() {
-        return getStringEntriesFullSorted(translucentSupport);
+        return getStringEntriesFullSorted(generalFloodFillSupport.translucentSupport);
     }
     public static @NotNull LinkedHashMap<Short, String> getStringEntriesFullSorted(Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> map) {
         LinkedHashMap<Short, String> result = new LinkedHashMap<>();
@@ -43,7 +27,7 @@ public class FloodFillSupportIntermediate {
 
 
     public @NotNull Map<Short, String> getMainNonFullEntries() {
-        return getStringEntriesFullSemiSorted(mainNonFullSupport);
+        return getStringEntriesFullSemiSorted(generalFloodFillSupport.mainNonFullSupport);
     }
     public static @NotNull Map<Short, String> getStringEntriesFullSemiSorted(Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> map) {
         Map<Short, String> result = new HashMap<>();

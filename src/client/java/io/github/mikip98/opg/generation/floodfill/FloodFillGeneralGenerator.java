@@ -16,7 +16,7 @@ import java.util.*;
 
 import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
 
-public class FloodFillGenerator {
+public class FloodFillGeneralGenerator {
 
     protected final Controller controller;
 
@@ -33,7 +33,7 @@ public class FloodFillGenerator {
     public FloodFillSupportIntermediate floodFillSupportIntermediate;
 
 
-    public FloodFillGenerator(Controller controller) {
+    public FloodFillGeneralGenerator(Controller controller) {
         this.controller = controller;
         this.floodFillSupportIntermediate = new FloodFillSupportIntermediate();
     }
