@@ -11,13 +11,18 @@ public class DotPropertiesInfo {
     @SuppressWarnings("rawtypes")
     public Map<String, Map<String, Set<Map<SimplifiedProperty, Comparable>>>> nativelySupportedBlockstates;
     // ModId -> BlockstateId -> Set of Property value pairs
+    public Map<String, Set<String>> nativelySupportedItems;
+    // ModId -> list of ItemIds
+
     public AutoSupport existingAutoSupport;
 
     @SuppressWarnings("rawtypes")
     public DotPropertiesInfo(
             Map<String, Map<String, Set<Map<String, String>>>> nativelySupportedBlockstatesWPropertyStrings,
+            Map<String, Set<String>> nativelySupportedItems,
             AutoSupport existingAutoSupport
     ) {
+        this.nativelySupportedItems = nativelySupportedItems;
         this.existingAutoSupport = existingAutoSupport;
 
         Map<String, SimplifiedProperty> propertyName2SimplifiedPropertyMap = OtherAPI.getPropertyName2SimplifiedPropertyMap();

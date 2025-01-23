@@ -56,7 +56,10 @@ public class FloodFillGenerator {
                 ColorRGBA color = colorReturn.color_avg;
 
                 FloodFillColor floodFillColor = new FloodFillColor(color, blockstateWrapper.defaultEmission);
-                floodFillSupportIntermediate.lightEmittingSupport.computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
+                floodFillSupportIntermediate.lightEmittingSupport
+                        .computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>())
+                        .computeIfAbsent(modId, k -> new HashMap<>())
+                        .computeIfAbsent(blockstateId, k -> new HashSet<>());
 
                 Map<Byte, Set<Map<SimplifiedProperty, Comparable>>> propertiesData = blocksDataEntry.getValue();
 
@@ -75,7 +78,7 @@ public class FloodFillGenerator {
                     }
 
                     for (String blockstateWProperties : blockstatesWProperties) {
-                        floodFillSupportIntermediate.lightEmittingSupport.computeIfAbsent(emissiveDataHSV, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+//                        floodFillSupportIntermediate.lightEmittingSupport.computeIfAbsent(emissiveDataHSV, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
                     }
                 }
             }
@@ -107,7 +110,10 @@ public class FloodFillGenerator {
                 short tintData = floodFillColor.getTintData();
 
                 for (String blockstateWProperties : blockstatesWProperties) {
-                    floodFillSupportIntermediate.translucentSupport.computeIfAbsent(tintData, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+                    floodFillSupportIntermediate.translucentSupport
+                            .computeIfAbsent(tintData, k -> new HashMap<>())
+                            .computeIfAbsent(modId, k -> new HashMap<>());
+//                            .computeIfAbsent(blockstateWProperties);
                 }
             }
         }
@@ -137,7 +143,7 @@ public class FloodFillGenerator {
                 short occlusionEntryId = volume2entry.get(volume);
 
                 for (String blockstateWProperties : blockstatesWProperties) {
-                    floodFillSupportIntermediate.mainNonFullSupport.computeIfAbsent(occlusionEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
+//                    floodFillSupportIntermediate.mainNonFullSupport.computeIfAbsent(occlusionEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
                 }
             }
         }
