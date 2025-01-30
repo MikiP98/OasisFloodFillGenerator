@@ -1,7 +1,8 @@
-package io.github.mikip98.opg.structures;
+package io.github.mikip98.opg.objects;
 
 import io.github.mikip98.del.api.OtherAPI;
 import io.github.mikip98.del.structures.SimplifiedProperty;
+import io.github.mikip98.opg.structures.AutoSupport;
 
 import java.util.*;
 
@@ -15,7 +16,6 @@ public class DotPropertiesInfo {
 
     public AutoSupport existingAutoSupport;
 
-    @SuppressWarnings("rawtypes")
     public DotPropertiesInfo(
             Map<String, Map<String, Set<Map<String, String>>>> nativelySupportedBlockstatesWPropertyStrings,
             Map<String, Set<String>> nativelySupportedItems,
@@ -35,16 +35,19 @@ public class DotPropertiesInfo {
                 String blockstateId = blockstateEntry.getKey();
                 Set<Map<String, String>> propertySets = blockstateEntry.getValue();
 
-                Set<Map<SimplifiedProperty, Comparable>> simplifiedPropertySets = new HashSet<>();
+                Set<Map<SimplifiedProperty, Comparable<?>>> simplifiedPropertySets = new HashSet<>();
                 for (Map<String, String> propertySet : propertySets) {
-                    Map<SimplifiedProperty, Comparable> simplifiedPropertySet = new HashMap<>();
+                    Map<SimplifiedProperty, Comparable<?>> simplifiedPropertySet = new HashMap<>();
 
                     for (Map.Entry<String, String> propertyEntry : propertySet.entrySet()) {
                         String propertyName = propertyEntry.getKey();
                         String propertyValue = propertyEntry.getValue();
                         if (propertyName2SimplifiedPropertyMap.containsKey(propertyName)) {
                             SimplifiedProperty simplifiedProperty = propertyName2SimplifiedPropertyMap.get(propertyName);
+                            LOGGER.info("Property: {} = {}", propertyName, propertyValue);
+                            LOGGER.info("Allowed values: {}", simplifiedProperty.allowedValues);
                             simplifiedPropertySet.put(simplifiedProperty, simplifiedProperty.converter.apply(propertyValue));
+//                            net.minecraft.block.enums.PistonType
                         } else {
                             LOGGER.error("Unknown property: {}", propertyName);
                             simplifiedPropertySet.put(new SimplifiedProperty(propertyName, null, null), propertyValue);

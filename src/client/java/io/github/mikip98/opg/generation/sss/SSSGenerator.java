@@ -4,13 +4,14 @@ import io.github.mikip98.del.api.BlockstatesAPI;
 import io.github.mikip98.opg.config.Config;
 import io.github.mikip98.opg.enums.SSSTypes;
 import io.github.mikip98.opg.generation.Controller;
+import io.github.mikip98.opg.objects.SSSSupportIntermediate;
 import net.minecraft.block.*;
 
 import java.util.*;
 
 public class SSSGenerator {
 
-    public static Map<Short, Map<String, List<String>>> generateSSS(Controller controller) {
+    public static SSSSupportIntermediate generateSSS(Controller controller) {
         final Set<Class<?>> classesOfInterest = Set.of(
                 AbstractBannerBlock.class,      // Wall and Floor Banners
                 AbstractPlantPartBlock.class,   // E.G. Kelp; SSS but no waving
@@ -49,6 +50,8 @@ public class SSSGenerator {
         }
 
         dataOfInterest.put(PlantBlock.class, otherPlants);
+        dataOfInterest.remove(MushroomPlantBlock.class);
+        dataOfInterest.remove(TallPlantBlock.class);
 
 
 //        Map<String, List<String>> leavesData = dataOfInterest.get(LeavesBlock.class);
@@ -77,7 +80,6 @@ public class SSSGenerator {
         for (Map.Entry<Class<?>, Map<String, List<String>>> entry : dataOfInterest.entrySet()) {
             Class<?> clazz = entry.getKey();
             SSSTypes category = Config.MCClass2SSSCategory.get(clazz);
-            if (category == null) continue;
             short entryId = Config.SSSCategory2EntryId.get(category);
             Map<String, List<String>> blockstateData = entry.getValue();
 
@@ -101,19 +103,15 @@ public class SSSGenerator {
             String modId = entry.getKey();
             List<String> blockstateIds = entry.getValue();
             for (String blockstateId : blockstateIds) {
+                List<String> blockstateWProperties = controller.getNotSupportedBlockstates(modId, blockstateId);
                 SSSSupportEntries.computeIfAbsent(tallPlantLowerEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId + ":half=lower");
                 SSSSupportEntries.computeIfAbsent(tallPlantUpperEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId + ":half=upper");
             }
         }
 
 
-        List<Short> allEntryIds = new ArrayList<>(SSSSupportEntries.keySet());
-        Collections.sort(allEntryIds);
-        for (short entryId : allEntryIds) {
-
-        }
-
-
-        return SSSSupportEntries;
+        return new SSSSupportIntermediate(
+                SSSSupportEntries
+        );
     }
 }

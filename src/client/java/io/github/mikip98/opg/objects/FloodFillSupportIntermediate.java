@@ -1,15 +1,18 @@
-package io.github.mikip98.opg.structures;
+package io.github.mikip98.opg.objects;
 
+import io.github.mikip98.opg.structures.FloodFillGeneralSupport;
+import io.github.mikip98.opg.structures.FloodFillSpecialSupport;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FloodFillSupportIntermediate {
     // General floodfill support
-    FloodFillGeneralSupport generalFloodFillSupport;
+    public FloodFillGeneralSupport generalFloodFillSupport;
 
     // Specialized floodfill support
-    FloodFillSpecialSupport specialFloodFillSupport;
+    public FloodFillSpecialSupport specialFloodFillSupport;
 
 
 
@@ -68,12 +71,17 @@ public class FloodFillSupportIntermediate {
                                 return sizeCompare;
                             })
                             .forEach(propertyMap -> {
+                                String[] properties = new String[propertyMap.size()];
+                                AtomicInteger i = new AtomicInteger();
+
                                 // Iterate through the sorted map entries
                                 propertyMap.entrySet().stream()
                                         .sorted(Map.Entry.comparingByKey())
                                         .forEach(entry -> {
-                                            // TODO: finish
+                                            properties[i.getAndIncrement()] = entry.getKey() + "=" + entry.getValue();
                                         });
+
+                                result.put(entryId, modId + ":" + blockstateId + ":" + String.join(":", properties));
                             });
                 }
             }

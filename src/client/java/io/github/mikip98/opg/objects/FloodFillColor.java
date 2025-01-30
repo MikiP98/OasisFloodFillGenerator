@@ -1,4 +1,4 @@
-package io.github.mikip98.opg.structures;
+package io.github.mikip98.opg.objects;
 
 import io.github.mikip98.del.structures.ColorRGBA;
 

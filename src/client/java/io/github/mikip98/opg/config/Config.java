@@ -3,7 +3,9 @@ package io.github.mikip98.opg.config;
 import io.github.mikip98.opg.enums.SSSTypes;
 import net.minecraft.block.*;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Config {
 
@@ -50,4 +52,18 @@ public class Config {
             // 'TallPlantBlock.class' is not included as it's type is both 'SSSTypes.TALL_PLANT_LOWER' and 'SSSTypes.TALL_PLANT_UPPER'
             // Because of that it can't be configured right now
     );
+
+
+    // --- CACHE ---
+
+    public static final Set<Short> entriesOfInterest = generateEntriesOfInterest();
+    protected static Set<Short> generateEntriesOfInterest() {
+        Set<Short> result = new HashSet<>(SSSCategory2EntryId.values());
+
+        for (int i = 0; i < floodFillIgnoreEntryCount; i++) {
+            result.add((short) (floodFillIgnoreFirstEntryId + i));
+        }
+
+        return result;
+    }
 }

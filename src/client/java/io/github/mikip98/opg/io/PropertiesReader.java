@@ -1,6 +1,6 @@
 package io.github.mikip98.opg.io;
 
-import io.github.mikip98.opg.structures.DotPropertiesInfo;
+import io.github.mikip98.opg.objects.DotPropertiesInfo;
 import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,18 +43,19 @@ public class PropertiesReader {
                     if (line_continuation) {
                         blockIdsTable = line.split(" ");
                         line_continuation = blockIdsTable[blockIdsTable.length - 1].equals("/");
-                        blockIdsArray = (LinkedList<String>) Arrays.stream(blockIdsTable).toList();
+                        blockIdsArray = new LinkedList<>(Arrays.stream(blockIdsTable).sorted().toList());
                     }
                     else if (line.startsWith("block.")) {
                         blockIdsTable = line.split("=", 2)[1].split(" ");
                         line_continuation = blockIdsTable[blockIdsTable.length - 1].equals("/");
-                        blockIdsArray = (LinkedList<String>) Arrays.stream(blockIdsTable).toList();
+                        blockIdsArray = new LinkedList<>(Arrays.stream(blockIdsTable).sorted().toList());
                     }
                     else if (line.startsWith("#define")) {
                         blockIdsTable = line.split(" ");
                         line_continuation = blockIdsTable[blockIdsTable.length - 1].equals("/");
-                        blockIdsArray = (LinkedList<String>) Arrays.stream(blockIdsTable).unordered().skip(2).toList();
-                        // '.skip(2)' removes '#define' and the define name
+                        blockIdsArray = new LinkedList<>(Arrays.stream(blockIdsTable).sorted().toList());  // .skip(2)
+                        blockIdsArray.removeFirst(); blockIdsArray.removeFirst();
+                        // '.skip(2)' removes '#define' and the define name, but is slow with .sorted()
                     } else continue;
 
                     if (line_continuation) blockIdsArray.removeLast();  // Remove the '/' fom the end
@@ -148,7 +149,12 @@ public class PropertiesReader {
                 propertiesData.add(parts[1]);
                 if (parts.length == 3) propertiesData.addAll(List.of(parts[2].split(":")));
             }
-            else {
+            else if (parts.length == 2) {
+                // No properties, e.g. 'minecraft:flowing_water'
+                modId = parts[0];
+                blockstateId = parts[1];
+                propertiesData = null;
+            } else {
                 // E.G. 'minecraft:snow:layers=2', full
                 modId = parts[0];
                 blockstateId = parts[1];

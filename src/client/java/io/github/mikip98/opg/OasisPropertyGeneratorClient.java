@@ -4,7 +4,7 @@ import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.opg.generation.MainGenerator;
 import io.github.mikip98.opg.io.PropertiesReader;
 import io.github.mikip98.opg.io.PropertiesWriter;
-import io.github.mikip98.opg.structures.DotPropertiesInfo;
+import io.github.mikip98.opg.objects.DotPropertiesInfo;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -39,8 +39,8 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		}
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-				dispatcher.register(literal("generate")
-						.then(literal("all").executes(context -> {
+				dispatcher.register(literal("oasis")
+						.then(literal("generate_all").executes(context -> {
 							Thread thread = new Thread(
                                     OasisPropertyGeneratorClient::generateAutoShaderSupport
 							);
@@ -67,44 +67,13 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		CacheAPI.cachePathsIfNotCached();
 
 		DotPropertiesInfo dotPropertiesInfo = PropertiesReader.getDotPropertiesInfo();
+
 		MainGenerator mainGenerator = new MainGenerator(dotPropertiesInfo);
+		mainGenerator.run();
 
-		PropertiesWriter.writeToProperties(null, null, null, null);
+		PropertiesWriter writer = new PropertiesWriter(mainGenerator.getSupport());
+		writer.writeToProperties();
 
-//		// ModId -> BlockstateId -> Light level -> Set of Property value pairs
-//		Map<String, Map<BlockstateWrapper, Map<Byte, Set<Map<SimplifiedProperty, Comparable>>>>> lightEmittingBlocksData = BlockstatesAPI.getLightEmittingBlocksData();
-//
-//		// ModId -> List of BlockstateIds
-//		Map<String, List<String>> translucentBlocksData = BlockstatesAPI.getTranslucentBlockNames();
-//
-//		// ModId -> BlockstateId -> block volume
-//		VolumeData volumeData = BlockstatesAPI.getNonFullBlocks();
-//		Map<String, Map<String, Double>> nonFullBlocksData = volumeData.knownNonFullBlocksData;
-
-
-//		final List<Runnable> pipeline = List.of(
-//				this::generateFloodFillEmissiveEntries,
-//				this::generateFloodFillTranslucentEntries,
-//				this::generateSSS,
-//				this::generateFloodFillIgnoreEntries
-//		);
-//
-//		Controller controller = new Controller(getAlreadySupportedBlockstates(getKnownPropertyMap(lightEmittingBlocksData)));
-//		FloodFill floodFill = new FloodFill(controller);
-//
-//		SSS.generateSSS(controller);
-
-//		FloodFill floodFill = new FloodFill(getAlreadySupportedBlockstates(getKnownPropertyMap(lightEmittingBlocksData)));
-//
-//		floodFill.generateFloodfillForLightEmittingBlocks(lightEmittingBlocksData);
-//		floodFill.generateFloodfillForTranslucentBlocks(translucentBlocksData);
-//		floodFill.generateFloodfillForNonFullBlocks(nonFullBlocksData);
-//
-//		PropertiesWriter.writeToProperties(
-//				floodFill.floodFillEmissiveBlockEntries,
-//				floodFill.floodFillEmissiveItemEntries,
-//				floodFill.floodFillTranslucentEntries,
-//				floodFill.floodFillIgnoreEntries
-//		);
+		LOGGER.info("Done!");
 	}
 }
