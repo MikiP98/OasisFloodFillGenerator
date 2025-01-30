@@ -41,10 +41,11 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 				dispatcher.register(literal("oasis")
 						.then(literal("generate_all").executes(context -> {
-							Thread thread = new Thread(
-                                    OasisPropertyGeneratorClient::generateAutoShaderSupport
-							);
-							thread.start();
+//							Thread thread = new Thread(
+//                                    OasisPropertyGeneratorClient::generateAutoShaderSupport
+//							);
+//							thread.start();
+							generateAutoShaderSupport();
 							return 0;
 						}))
 //						.then(literal("SSS").executes(context -> {

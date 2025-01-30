@@ -1,5 +1,6 @@
 package io.github.mikip98.opg.structures;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,4 +19,11 @@ public class FloodFillGeneralSupport {
 
     // Map<String, Map<String, Set<Map<String, Comparable<?>>>>> has construction:
     // ModId -> blockstateId -> propertySet -> property -> value
+
+
+    public FloodFillGeneralSupport() {
+        this.lightEmittingSupport = new HashMap<>();
+        this.translucentSupport = new HashMap<>();
+        this.mainNonFullSupport = new HashMap<>();
+    }
 }

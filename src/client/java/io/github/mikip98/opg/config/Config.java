@@ -48,9 +48,10 @@ public class Config {
             AbstractPlantPartBlock.class,   SSSTypes.STRONG,
             MushroomPlantBlock.class,       SSSTypes.WEAK,
             AbstractBannerBlock.class,      SSSTypes.WEAK_3,
-            GrassBlock.class,               SSSTypes.GRASS
-            // 'TallPlantBlock.class' is not included as it's type is both 'SSSTypes.TALL_PLANT_LOWER' and 'SSSTypes.TALL_PLANT_UPPER'
-            // Because of that it can't be configured right now
+            GrassBlock.class,               SSSTypes.GRASS,
+            // 'TallPlantBlock.class' is later split into 'SSSTypes.TALL_PLANT_LOWER' and 'SSSTypes.TALL_PLANT_UPPER'
+            // Here only the lower part is added for it to be processed
+            TallPlantBlock.class,           SSSTypes.TALL_PLANT_LOWER
     );
 
 

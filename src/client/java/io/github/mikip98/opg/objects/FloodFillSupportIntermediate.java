@@ -15,6 +15,11 @@ public class FloodFillSupportIntermediate {
     public FloodFillSpecialSupport specialFloodFillSupport;
 
 
+    public FloodFillSupportIntermediate() {
+        this.generalFloodFillSupport = new FloodFillGeneralSupport();
+        this.specialFloodFillSupport = new FloodFillSpecialSupport();
+    }
+
 
     public @NotNull LinkedHashMap<Short, String> getLightEmittingEntries() {
         return getStringEntriesFullSorted(generalFloodFillSupport.lightEmittingSupport);

@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
+import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
 
 public class PropertiesReader {
 

@@ -50,30 +50,8 @@ public class SSSGenerator {
         }
 
         dataOfInterest.put(PlantBlock.class, otherPlants);
-        dataOfInterest.remove(MushroomPlantBlock.class);
-        dataOfInterest.remove(TallPlantBlock.class);
-
-
-//        Map<String, List<String>> leavesData = dataOfInterest.get(LeavesBlock.class);
-//        List<String> modIds = new ArrayList<>(leavesData.keySet());
-//        Collections.sort(modIds);
-//        for (String modId : modIds) {
-//            List<String> blockstateIds = leavesData.get(modId);
-//            LOGGER.info(String.join(" ", blockstateIds.stream().map(blockstateId -> modId + ":" + blockstateId).toList()));
-//        }
-
-//        for (Map.Entry<Class<?>, Map<String, List<String>>> entry : dataOfInterest.entrySet()) {
-//            Class<?> clazz = entry.getKey();
-//            LOGGER.info(clazz.getSimpleName());
-//            Map<String, List<String>> blockstateData = entry.getValue();
-//            List<String> modIds = new ArrayList<>(blockstateData.keySet());
-//            Collections.sort(modIds);
-//            for (String modId : modIds) {
-//                LOGGER.info("- {}", modId);
-//                List<String> blockstateIds = blockstateData.get(modId);
-//                LOGGER.info("  - {}", String.join(" ", blockstateIds.stream().map(blockstateId -> modId + ":" + blockstateId).toList()));
-//            }
-//        }
+//        dataOfInterest.remove(MushroomPlantBlock.class);
+//        dataOfInterest.remove(TallPlantBlock.class);
 
         Map<Short, Map<String, List<String>>> SSSSupportEntries = new HashMap<>();
 
@@ -101,10 +79,10 @@ public class SSSGenerator {
 
         for (Map.Entry<String, List<String>> entry : SSSSupportEntries.get(tallPlantLowerEntryId).entrySet()) {
             String modId = entry.getKey();
-            List<String> blockstateIds = entry.getValue();
+            List<String> blockstateIds = new ArrayList<>(entry.getValue());
             for (String blockstateId : blockstateIds) {
-                List<String> blockstateWProperties = controller.getNotSupportedBlockstates(modId, blockstateId);
-                SSSSupportEntries.computeIfAbsent(tallPlantLowerEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId + ":half=lower");
+                SSSSupportEntries.get(tallPlantLowerEntryId).get(modId).remove(blockstateId);
+                SSSSupportEntries.get(tallPlantLowerEntryId).get(modId).add(blockstateId + ":half=lower");
                 SSSSupportEntries.computeIfAbsent(tallPlantUpperEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId + ":half=upper");
             }
         }

@@ -24,8 +24,8 @@ public class MainGenerator {
 
     protected final Controller controller;
     protected final FloodFillGeneralGenerator floodFillGeneralGenerator;
-    FloodFillSupportIntermediate floodFillSupport;
-    SSSSupportIntermediate sssSupport;
+    FloodFillSupportIntermediate floodFillSupport = new FloodFillSupportIntermediate();
+    SSSSupportIntermediate sssSupport = new SSSSupportIntermediate();
 
 
     public MainGenerator(DotPropertiesInfo dotPropertiesInfo) {
