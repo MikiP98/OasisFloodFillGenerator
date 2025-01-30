@@ -45,39 +45,34 @@ public class Controller {
         return unsupportedBlockstatesWProperties;
     }
 
-    public List<String> getNotSupportedBlockstates(String modId, String blockstateId, Set<Map<SimplifiedProperty, Comparable<?>>> propertySets) {
+    public Set<Map<String, Comparable<?>>> getNotSupportedBlockstates(String modId, String blockstateId, Set<Map<SimplifiedProperty, Comparable<?>>> propertySets) {
         // {blockstateId}:{property1Name}={property2Value}:{property2Name}={property2Value}...
-        List<String> unsupportedBlockstatesWProperties = new ArrayList<>();
+        Set<Map<String, Comparable<?>>> unsupportedBlockstatesWProperties = new HashSet<>();
 
         if (alreadySupportedBlockstates.containsKey(modId) && alreadySupportedBlockstates.get(modId).containsKey(blockstateId)) {
             // If 'null', all the blockstates automation combinations are already supported
             if (alreadySupportedBlockstates.get(modId).get(blockstateId) != null) {
                 for (Map<SimplifiedProperty, Comparable<?>> propertySet : propertySets) {
-                    if (!alreadySupportedBlockstates.get(modId).get(blockstateId).contains(propertySet)) {
-                        String[] properties = new String[propertySet.size()];
-                        List<SimplifiedProperty> propertyKeys = new ArrayList<>(propertySet.keySet());
-                        propertyKeys.sort(Comparator.comparing(p -> p.name));
-                        for (int i = 0; i < propertyKeys.size(); i++) {
-                            properties[i] = propertyKeys.get(i).name + "=" + propertySet.get(propertyKeys.get(i));
-                        }
-
-                        unsupportedBlockstatesWProperties.add(blockstateId + ":" + String.join(":", properties));
-                        alreadySupportedBlockstates.get(modId).get(blockstateId).add(propertySet);
-                    }
+//                    if (!alreadySupportedBlockstates.get(modId).get(blockstateId).contains(propertySet)) {
+//                        Map<String, Comparable<?>> map = new HashMap<>();
+//                        for (Map.Entry<SimplifiedProperty, Comparable<?>> entry : propertySet.entrySet()) {
+//                            map.put(entry.getKey().name, entry.getValue());
+//                        }
+//                        unsupportedBlockstatesWProperties.add(map);
+//
+//                        alreadySupportedBlockstates.get(modId).get(blockstateId).add(propertySet);
+//                    }
                 }
             } else {
-                return unsupportedBlockstatesWProperties;
+                return null;
             }
         } else {
             for (Map<SimplifiedProperty, Comparable<?>> propertySet : propertySets) {
-                String[] properties = new String[propertySet.size()];
-                List<SimplifiedProperty> propertyKeys = new ArrayList<>(propertySet.keySet());
-                propertyKeys.sort(Comparator.comparing(p -> p.name));
-                for (int i = 0; i < propertyKeys.size(); i++) {
-                    properties[i] = propertyKeys.get(i).name + "=" + propertySet.get(propertyKeys.get(i));
+                Map<String, Comparable<?>> map = new HashMap<>();
+                for (Map.Entry<SimplifiedProperty, Comparable<?>> entry : propertySet.entrySet()) {
+                    map.put(entry.getKey().name, entry.getValue());
                 }
-
-                unsupportedBlockstatesWProperties.add(blockstateId + ":" + String.join(":", properties));
+                unsupportedBlockstatesWProperties.add(map);
             }
             alreadySupportedBlockstates.computeIfAbsent(modId, k -> new HashMap<>()).put(blockstateId, propertySets);
             newSupportStats.putIfAbsent(modId, 0);

@@ -70,6 +70,7 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		DotPropertiesInfo dotPropertiesInfo = PropertiesReader.getDotPropertiesInfo();
 
 		MainGenerator mainGenerator = new MainGenerator(dotPropertiesInfo);
+		LOGGER.info("Natively supported blocks: {}", dotPropertiesInfo.nativelySupportedBlockstates);
 		mainGenerator.run();
 
 		PropertiesWriter writer = new PropertiesWriter(mainGenerator.getSupport());

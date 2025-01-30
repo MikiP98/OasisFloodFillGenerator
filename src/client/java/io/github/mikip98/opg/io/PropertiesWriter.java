@@ -108,6 +108,7 @@ public class PropertiesWriter {
 
             new_properties.append("\n# Emissive\n");
             LinkedHashMap<Short, String> emissiveEntriesMap = floodFillSupport.getLightEmittingEntries();
+            LOGGER.info("Writing '{}', emissive entries", emissiveEntriesMap.size());
             for (Short entryId : emissiveEntriesMap.keySet()) {
                 new_properties
                         .append("block.").append(entryId)
@@ -118,6 +119,7 @@ public class PropertiesWriter {
 
             new_properties.append("\n# Translucent\n");
             LinkedHashMap<Short, String> floodFillTranslucentEntriesMap = floodFillSupport.getTranslucentEntries();
+            LOGGER.info("Writing '{}', translucent entries", floodFillTranslucentEntriesMap.size());
             for (Short entryId : floodFillTranslucentEntriesMap.keySet()) {
                 new_properties
                         .append("block.").append(entryId)

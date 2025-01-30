@@ -46,6 +46,26 @@ public class MainGenerator {
     protected void generateFloodFillEmissiveEntries() {
         LOGGER.info("Generating flood fill for light emitting blocks");
         floodFillGeneralGenerator.generateFloodfillForLightEmittingBlocks();
+
+        int blockCount = 0;
+        for (Map.Entry<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> entry : floodFillSupport.generalFloodFillSupport.lightEmittingSupport.entrySet()) {
+            for (Map.Entry<String, Map<String, Set<Map<String, Comparable<?>>>>> modEntry : entry.getValue().entrySet()) {
+                for (Map.Entry<String, Set<Map<String, Comparable<?>>>> blockstateEntry : modEntry.getValue().entrySet()) {
+                    blockCount += blockstateEntry.getValue().size();
+                }
+            }
+        }
+        LOGGER.info("Generated {} flood fill entries for light emitting blocks", blockCount);
+
+        blockCount = 0;
+        for (Map.Entry<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> entry : floodFillGeneralGenerator.floodFillGeneralSupport.lightEmittingSupport.entrySet()) {
+            for (Map.Entry<String, Map<String, Set<Map<String, Comparable<?>>>>> modEntry : entry.getValue().entrySet()) {
+                for (Map.Entry<String, Set<Map<String, Comparable<?>>>> blockstateEntry : modEntry.getValue().entrySet()) {
+                    blockCount += blockstateEntry.getValue().size();
+                }
+            }
+        }
+        LOGGER.info("Generated {} flood fill entries for light emitting blocks", blockCount);
     }
 
     protected void generateFloodFillTranslucentEntries() {

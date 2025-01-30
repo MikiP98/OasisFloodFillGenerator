@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
+
 public class FloodFillSupportIntermediate {
     // General floodfill support
     public FloodFillGeneralSupport generalFloodFillSupport;
@@ -22,6 +24,15 @@ public class FloodFillSupportIntermediate {
 
 
     public @NotNull LinkedHashMap<Short, String> getLightEmittingEntries() {
+        int blockCount = 0;
+        for (Map.Entry<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> entry : generalFloodFillSupport.lightEmittingSupport.entrySet()) {
+            for (Map.Entry<String, Map<String, Set<Map<String, Comparable<?>>>>> modEntry : entry.getValue().entrySet()) {
+                for (Map.Entry<String, Set<Map<String, Comparable<?>>>> blockstateEntry : modEntry.getValue().entrySet()) {
+                    blockCount += blockstateEntry.getValue().size();
+                }
+            }
+        }
+        LOGGER.info("Requested string entries for '{}' light emitting blocks", blockCount);
         return getStringEntriesFullSorted(generalFloodFillSupport.lightEmittingSupport);
     }
     public @NotNull LinkedHashMap<Short, String> getTranslucentEntries() {
@@ -60,6 +71,10 @@ public class FloodFillSupportIntermediate {
 
                 for (String blockstateId : blockstateIds) {
                     Set<Map<String, Comparable<?>>> propertySets = mapBlockstates.get(blockstateId);
+                    if (propertySets == null || propertySets.isEmpty()) {
+                        result.put(entryId, modId + ":" + blockstateId);
+                        continue;
+                    }
                     // Sort this so that smaller sets are first then with alphabetical order
                     // Sort the set of maps
                     propertySets.stream()
@@ -85,8 +100,8 @@ public class FloodFillSupportIntermediate {
                                         .forEach(entry -> {
                                             properties[i.getAndIncrement()] = entry.getKey() + "=" + entry.getValue();
                                         });
-
-                                result.put(entryId, modId + ":" + blockstateId + ":" + String.join(":", properties));
+                                if (properties.length == 0) result.put(entryId, modId + ":" + blockstateId);
+                                else result.put(entryId, modId + ":" + blockstateId + ":" + String.join(":", properties));
                             });
                 }
             }
