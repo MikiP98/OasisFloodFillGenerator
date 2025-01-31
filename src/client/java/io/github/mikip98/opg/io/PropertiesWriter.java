@@ -14,8 +14,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static io.github.mikip98.del.DataExtractionLibraryClient.LOGGER;
-import static io.github.mikip98.opg.config.Config.entriesOfInterest;
+import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
 
 public class PropertiesWriter {
     protected FloodFillSupportIntermediate floodFillSupport;
@@ -88,7 +87,7 @@ public class PropertiesWriter {
                     String[] keyValue = line.split("=", 2);
                     Short entryId = Short.valueOf(keyValue[0].strip().substring(6));  // TODO: int?
 
-                    if (entriesOfInterest.contains(entryId)) {
+                    if (Config.entriesOfInterest.contains(entryId)) {
                         // TODO
                     }
 

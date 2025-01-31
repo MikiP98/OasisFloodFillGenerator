@@ -2,6 +2,7 @@ package io.github.mikip98.opg;
 
 import io.github.mikip98.del.api.CacheAPI;
 import io.github.mikip98.opg.generation.MainGenerator;
+import io.github.mikip98.opg.io.DebugWriter;
 import io.github.mikip98.opg.io.PropertiesReader;
 import io.github.mikip98.opg.io.PropertiesWriter;
 import io.github.mikip98.opg.objects.DotPropertiesInfo;
@@ -71,6 +72,7 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 
 		MainGenerator mainGenerator = new MainGenerator(dotPropertiesInfo);
 		LOGGER.info("Natively supported blocks: {}", dotPropertiesInfo.nativelySupportedBlockstates);
+		DebugWriter.saveNativelySupportedDataToFile(dotPropertiesInfo.nativelySupportedBlockstates);
 		mainGenerator.run();
 
 		PropertiesWriter writer = new PropertiesWriter(mainGenerator.getSupport());
