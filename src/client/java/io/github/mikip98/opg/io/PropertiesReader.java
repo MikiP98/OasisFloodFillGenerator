@@ -35,31 +35,33 @@ public class PropertiesReader {
                 String line;
                 boolean line_continuation = false;
                 String[] blockIdsTable;
-                LinkedList<String> blockIdsArray;
+                List<String> blockIdsList;
 
                 while ((line = br.readLine()) != null) {
                     line = line.strip().toLowerCase();
 
                     if (line_continuation) {
                         blockIdsTable = line.split(" ");
-                        line_continuation = blockIdsTable[blockIdsTable.length - 1].equals("/");
-                        blockIdsArray = new LinkedList<>(Arrays.stream(blockIdsTable).sorted().toList());
                     }
                     else if (line.startsWith("block.")) {
                         blockIdsTable = line.split("=", 2)[1].split(" ");
-                        line_continuation = blockIdsTable[blockIdsTable.length - 1].equals("/");
-                        blockIdsArray = new LinkedList<>(Arrays.stream(blockIdsTable).sorted().toList());
                     }
                     else if (line.startsWith("#define")) {
-                        blockIdsTable = line.split(" ");
-                        line_continuation = blockIdsTable[blockIdsTable.length - 1].equals("/");
-                        blockIdsArray = new LinkedList<>(Arrays.stream(blockIdsTable).sorted().toList());  // .skip(2)
-                        blockIdsArray.removeFirst(); blockIdsArray.removeFirst();
-                        // '.skip(2)' removes '#define' and the define name, but is slow with .sorted()
+                        blockIdsTable = Arrays.stream(line.split(" ")).skip(2).toArray(String[]::new);
                     } else continue;
 
-                    if (line_continuation) blockIdsArray.removeLast();  // Remove the '/' fom the end
-                    addBlockstates(nativelySupportedBlockstates, blockIdsArray);
+                    blockIdsList = new ArrayList<>(Arrays.stream(blockIdsTable).toList());
+                    int lastElementIndex = blockIdsList.size() - 1;
+                    line_continuation = blockIdsList.get(lastElementIndex).equals("\\");
+                    if (line_continuation) blockIdsList.remove(lastElementIndex);  // Remove the '\' from the end
+
+                    List<String> filteredBlockIds = new ArrayList<>();
+                    for (String blockId : blockIdsList) {
+                        if (blockId.isBlank() || blockId.equals("\\") || blockId.equals("\\n")) continue;
+                        filteredBlockIds.add(blockId);
+                    }
+
+                    addBlockstates(nativelySupportedBlockstates, filteredBlockIds);
                 }
             } catch (IOException e) {
                 LOGGER.error("Error while reading block.properties", e);
@@ -81,7 +83,9 @@ public class PropertiesReader {
                 while ((line = br.readLine()) != null) {
                     line = line.strip().toLowerCase();
 
+                    // TODO: Add defines support
                     if (line_continuation) {
+                        if (line.startsWith("#ifdef")) continue;  // TODO: Make the auto support be skipped (added to stats instead)
                         itemIdsTable = line.split(" ");
                         line_continuation = itemIdsTable[itemIdsTable.length - 1].equals("/");
                         itemIdsArray = (LinkedList<String>) Arrays.stream(itemIdsTable).toList();
@@ -98,7 +102,16 @@ public class PropertiesReader {
                         // '.skip(2)' removes '#define' and the define name
                     } else continue;
 
-                    if (line_continuation) itemIdsArray.removeLast();  // Remove the '/' fom the end
+                    LOGGER.info("Line: {}", line);
+                    LOGGER.info("Last element: {}", itemIdsArray.getLast());
+                    if (line_continuation) {
+                        LOGGER.info("Line continuation detected, removing last element: {}", itemIdsArray.getLast());
+                        itemIdsArray.removeLast();  // Remove the '/' fom the end
+                        LOGGER.info("New last element: {}", itemIdsArray.getLast());
+                    }
+
+//                    itemIdsArray.stream().filter(s -> s.isBlank() || s.strip().equals("/")).forEach(itemIdsArray::remove);
+
                     for (String itemData : itemIdsArray) {
                         String[] parts = itemData.split(":");
                         String modId;
@@ -166,14 +179,15 @@ public class PropertiesReader {
             } else {
                 if (map.containsKey(modId) && map.get(modId).containsKey(blockstateId) && map.get(modId).get(blockstateId) == null) continue;
 
-                Set<Map<String, String>> propertySets = new HashSet<>();
+//                Set<Map<String, String>> propertySets = new HashSet<>();
+                Map<String, String> currentPropertySet = new HashMap<>();
                 for (String propertyData : propertiesData) {
                     String[] propertyParts = propertyData.split("=", 2);
                     String propertyName = propertyParts[0];
                     String propertyValue = propertyParts[1];
-                    propertySets.add(Map.of(propertyName, propertyValue));
+                    currentPropertySet.put(propertyName, propertyValue);
                 }
-                map.computeIfAbsent(modId, k -> new HashMap<>()).computeIfAbsent(blockstateId, k -> new HashSet<>()).addAll(propertySets);
+                map.computeIfAbsent(modId, k -> new HashMap<>()).computeIfAbsent(blockstateId, k -> new HashSet<>()).add(currentPropertySet);
             }
         }
     }

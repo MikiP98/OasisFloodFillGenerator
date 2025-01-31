@@ -6,8 +6,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
 
@@ -38,27 +37,34 @@ public class DebugWriter {
             String modId = entry.getKey();
             output.append("\t\"").append(modId).append("\": {\n");
 
-            Map<String, Set<Map<SimplifiedProperty, Comparable<?>>>> blockstates = entry.getValue();
-            for (Map.Entry<String, Set<Map<SimplifiedProperty, Comparable<?>>>> entry2 : blockstates.entrySet()) {
-                String blockstateId = entry2.getKey();
-                output.append("\t\t\"").append(blockstateId).append("\": [\n");
+            Map<String, Set<Map<SimplifiedProperty, Comparable<?>>>> blockstatesMap = entry.getValue();
+            List<String> blockstateIds = new ArrayList<>(blockstatesMap.keySet());
+            Collections.sort(blockstateIds);
+            for (String blockstateId : blockstateIds) {
+                output.append("\t\t\"").append(blockstateId).append("\": ");
 
-                Set<Map<SimplifiedProperty, Comparable<?>>> properties = entry2.getValue();
-                if (properties == null) continue;
-                for (Map<SimplifiedProperty, Comparable<?>> entry3 : entry2.getValue()) {
-                    output.append("{\n");
-                    for (Map.Entry<SimplifiedProperty, Comparable<?>> entry4 : entry3.entrySet()) {
-                        output.append("\"").append(entry4.getKey()).append("\": ").append(entry4.getValue()).append(",\n");
-                    }
-                    output.deleteCharAt(output.length() - 1);  // Remove last comma
-                    output.append("},\n");
+                Set<Map<SimplifiedProperty, Comparable<?>>> properties = blockstatesMap.get(blockstateId);
+                if (properties == null) {
+                    output.append("null,\n");
+                    continue;
                 }
+                output.append("[\n");
+                for (Map<SimplifiedProperty, Comparable<?>> entry3 : properties) {
+                    output.append("\t\t\t{\n");
+                    for (Map.Entry<SimplifiedProperty, Comparable<?>> entry4 : entry3.entrySet()) {
+                        output.append("\t\t\t\t\"").append(entry4.getKey().name).append("\": \"").append(entry4.getValue().toString()).append("\",\n");
+                    }
+                    output.deleteCharAt(output.length() - 2);  // Remove last comma
+                    output.append("\t\t\t},\n");
+                }
+                output.deleteCharAt(output.length() - 2);  // Remove last comma
+                output.append("\t\t],\n");
             }
-            output.deleteCharAt(output.length() - 1);  // Remove last comma
-            output.append("}\n");
+            output.deleteCharAt(output.length() - 2);  // Remove last comma
+            output.append("\t},\n");
         }
 
-        output.deleteCharAt(output.length() - 1);  // Remove last comma
+        output.deleteCharAt(output.length() - 2);  // Remove last comma
         output.append("}\n");
 
 
