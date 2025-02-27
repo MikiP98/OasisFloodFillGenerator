@@ -1,10 +1,11 @@
 package io.github.mikip98.opg;
 
 import io.github.mikip98.del.api.CacheAPI;
+import io.github.mikip98.opg.config.Config;
 import io.github.mikip98.opg.generation.MainGenerator;
-import io.github.mikip98.opg.io.DebugWriter;
-import io.github.mikip98.opg.io.PropertiesReader;
-import io.github.mikip98.opg.io.PropertiesWriter;
+import io.github.mikip98.opg.io.out.DebugWriter;
+import io.github.mikip98.opg.io.in.PropertiesReader;
+import io.github.mikip98.opg.io.out.PropertiesWriter;
 import io.github.mikip98.opg.objects.DotPropertiesInfo;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -42,11 +43,11 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 				dispatcher.register(literal("oasis")
 						.then(literal("generate_all").executes(context -> {
-//							Thread thread = new Thread(
-//                                    OasisPropertyGeneratorClient::generateAutoShaderSupport
-//							);
-//							thread.start();
-							generateAutoShaderSupport();
+							Thread thread = new Thread(
+                                    OasisPropertyGeneratorClient::generateAutoShaderSupport
+							);
+							thread.start();
+//							generateAutoShaderSupport();
 							return 0;
 						}))
 //						.then(literal("SSS").executes(context -> {
@@ -71,8 +72,7 @@ public class OasisPropertyGeneratorClient implements ClientModInitializer {
 		DotPropertiesInfo dotPropertiesInfo = PropertiesReader.getDotPropertiesInfo();
 
 		MainGenerator mainGenerator = new MainGenerator(dotPropertiesInfo);
-		LOGGER.info("Natively supported blocks: {}", dotPropertiesInfo.nativelySupportedBlockstates);
-		DebugWriter.saveNativelySupportedDataToFile(dotPropertiesInfo.nativelySupportedBlockstates);
+		if (Config.DEBUG) DebugWriter.saveNativelySupportedDataToFile(dotPropertiesInfo.nativelySupportedBlockstates);
 		mainGenerator.run();
 
 		PropertiesWriter writer = new PropertiesWriter(mainGenerator.getSupport());

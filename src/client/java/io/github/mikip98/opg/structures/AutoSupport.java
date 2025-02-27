@@ -1,7 +1,7 @@
 package io.github.mikip98.opg.structures;
 
-import io.github.mikip98.opg.objects.FloodFillSupportIntermediate;
-import io.github.mikip98.opg.objects.SSSSupportIntermediate;
+import io.github.mikip98.opg.generation.floodfill.FloodFillSupportIntermediate;
+import io.github.mikip98.opg.generation.sss.SSSSupportIntermediate;
 
 public class AutoSupport {
     // Floodfill (emission, translucency, ignore, walls, stairs, slabs)

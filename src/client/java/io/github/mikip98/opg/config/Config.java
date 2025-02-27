@@ -32,17 +32,43 @@ public class Config {
 
     // --- SSS ---
 
+    public static final short ID_SSS_TALL_PLANT_LOWER = 13;
+    public static final short ID_SSS_TALL_PLANT_UPPER = 14;
+    public static final short ID_SSS_CEILING_WAVING = 17;
+    public static final short ID_SSS_GROUND_WAVING = 54;
+    public static final short ID_SSS_AIR_WAVING = 56;
+    public static final short ID_SSS_STRONG = 80;
+    public static final short ID_SSS_WEAK = 81;
+    public static final short ID_SSS_WEAK_3 = 83;
+    public  static final short ID_SSS_GRASS = 85;
+
+    public static final Set<Short> mainSSSEntryIds = Set.of(
+            ID_SSS_CEILING_WAVING,
+            ID_SSS_GROUND_WAVING,
+            ID_SSS_AIR_WAVING,
+            ID_SSS_STRONG,
+            ID_SSS_WEAK,
+            ID_SSS_WEAK_3,
+            ID_SSS_GRASS
+    );
+    public static final Set<Short> specialSSSEntryIds = Set.of(
+            ID_SSS_TALL_PLANT_LOWER,
+            ID_SSS_TALL_PLANT_UPPER
+    );
+
     public static final Map<SSSTypes, Short> SSSCategory2EntryId = Map.of(
-            SSSTypes.TALL_PLANT_LOWER,  (short) 13,  // TallPlantBlock.class
-            SSSTypes.TALL_PLANT_UPPER,  (short) 14,  // TallPlantBlock.class
-            SSSTypes.GROUND_WAVING,     (short) 54,  // PlantBlock.class (- mushrooms) (- tall plants)
-            SSSTypes.AIR_WAVING,        (short) 56,  // LeavesBlock.class
-            SSSTypes.STRONG,            (short) 80,  // AbstractPlantPartBlock.class
-            SSSTypes.WEAK,              (short) 81,  // MushroomPlantBlock.class
-            SSSTypes.WEAK_3,            (short) 83,  // AbstractBannerBlock.class
-            SSSTypes.GRASS,             (short) 85   // GrassBlock.class
+            SSSTypes.TALL_PLANT_LOWER,  ID_SSS_TALL_PLANT_LOWER,  // TallPlantBlock.class
+            SSSTypes.TALL_PLANT_UPPER,  ID_SSS_TALL_PLANT_UPPER,  // TallPlantBlock.class
+            SSSTypes.CEILING_WAVING,    ID_SSS_CEILING_WAVING,    // HangingRootsBlock.class
+            SSSTypes.GROUND_WAVING,     ID_SSS_GROUND_WAVING,     // PlantBlock.class (- mushrooms) (- tall plants)
+            SSSTypes.AIR_WAVING,        ID_SSS_AIR_WAVING,        // LeavesBlock.class
+            SSSTypes.STRONG,            ID_SSS_STRONG,            // AbstractPlantPartBlock.class
+            SSSTypes.WEAK,              ID_SSS_WEAK,              // MushroomPlantBlock.class
+            SSSTypes.WEAK_3,            ID_SSS_WEAK_3,            // AbstractBannerBlock.class
+            SSSTypes.GRASS,             ID_SSS_GRASS              // GrassBlock.class
     );
     public static final Map<Class<?>, SSSTypes> MCClass2SSSCategory = Map.of(
+            HangingRootsBlock.class,        SSSTypes.CEILING_WAVING,
             PlantBlock.class,               SSSTypes.GROUND_WAVING,
             LeavesBlock.class,              SSSTypes.AIR_WAVING,
             AbstractPlantPartBlock.class,   SSSTypes.STRONG,
@@ -55,16 +81,7 @@ public class Config {
     );
 
 
-    // --- CACHE ---
+    // --- DEBUG ---
 
-    public static final Set<Short> entriesOfInterest = generateEntriesOfInterest();
-    protected static Set<Short> generateEntriesOfInterest() {
-        Set<Short> result = new HashSet<>(SSSCategory2EntryId.values());
-
-        for (int i = 0; i < floodFillIgnoreEntryCount; i++) {
-            result.add((short) (floodFillIgnoreFirstEntryId + i));
-        }
-
-        return result;
-    }
+    public static final boolean DEBUG = true;
 }

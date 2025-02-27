@@ -11,7 +11,8 @@ public class FloodFillGeneralSupport {
     // EntryId -> ModId -> blockstateId -> propertySet -> property -> value
 
     // Auto Floodfill entry data format
-    public Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> lightEmittingSupport;
+    public Map<Short, Map<String, Set<String>>> lightEmittingItemSupport;
+    public Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> lightEmittingBlockSupport;
     public Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> translucentSupport;
 
     // By default (% is occlusion): 0% -> 50; 25% -> 51; 50% -> 52; 75% -> 53
@@ -22,7 +23,8 @@ public class FloodFillGeneralSupport {
 
 
     public FloodFillGeneralSupport() {
-        this.lightEmittingSupport = new HashMap<>();
+        this.lightEmittingBlockSupport = new HashMap<>();
+        this.lightEmittingItemSupport = new HashMap<>();
         this.translucentSupport = new HashMap<>();
         this.mainNonFullSupport = new HashMap<>();
     }

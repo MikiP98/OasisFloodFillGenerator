@@ -66,28 +66,38 @@ public class FloodFillGeneralGenerator {
                 ColorRGBA color = colorReturn.color_avg;
 
                 FloodFillColor floodFillColor = new FloodFillColor(color, blockstateWrapper.defaultEmission);
-                floodFillGeneralSupport.lightEmittingSupport
-                        .computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>())
-                        .computeIfAbsent(modId, k -> new HashMap<>())
-                        .computeIfAbsent(blockstateId, k -> new HashSet<>());
+
+                if (blockstateWrapper.defaultEmission > 0) {  // TODO: Is this check necessary?
+                    floodFillGeneralSupport.lightEmittingItemSupport
+                            .computeIfAbsent(floodFillColor.getEmissiveDataModeHSV(), k -> new HashMap<>())
+                            .computeIfAbsent(modId, k -> new HashSet<>())
+                            .add(blockstateId);
+                }
 
                 Map<Byte, Set<Map<SimplifiedProperty, Comparable>>> propertiesData = blocksDataEntry.getValue();
+
+                if (blockstateId.equals("red_umbrella_lamp")) {
+                    LOGGER.info("'red_umbrella_lamp' properties: {}", propertiesData);
+                }
 
                 for (Map.Entry<Byte, Set<Map<SimplifiedProperty, Comparable>>> propertiesDataEntry : propertiesData.entrySet()) {
                     byte lightLevel = propertiesDataEntry.getKey();
                     Set<Map<SimplifiedProperty, Comparable>> propertySets = propertiesDataEntry.getValue();
 
                     Set<Map<String, Comparable<?>>> unsupportedPropertySets = controller.getNotSupportedBlockstates(modId, blockstateId, (Set) propertySets);
-                    if (unsupportedPropertySets == null || unsupportedPropertySets.isEmpty()) continue;  // TODO: Why isEmpty()?
+//                    if (blockstateId.equals("red_umbrella_lamp")) {
+//                        LOGGER.info("'red_umbrella_lamp' unsupportedPropertySets prepost: {}", unsupportedPropertySets);
+//                    }
+                    if (unsupportedPropertySets == null) continue;
+                    if (unsupportedPropertySets.isEmpty()) unsupportedPropertySets = null;
+//                    if (blockstateId.equals("red_umbrella_lamp")) {
+//                        LOGGER.info("'red_umbrella_lamp' unsupportedPropertySets postpost: {}", unsupportedPropertySets);
+//                    }
 
                     floodFillColor = new FloodFillColor(color, lightLevel);
                     short emissiveDataHSV = floodFillColor.getEmissiveDataModeHSV();
 
-//                    if (blockstateId.equals("orange_lamp")) {
-//                        LOGGER.info("orange_lamp; Color: {}; EmissiveData: {}", color, emissiveDataHSV);
-//                    }
-
-                    floodFillGeneralSupport.lightEmittingSupport
+                    floodFillGeneralSupport.lightEmittingBlockSupport
                             .computeIfAbsent(emissiveDataHSV, k -> new HashMap<>())
                             .computeIfAbsent(modId, k -> new HashMap<>())
                             .put(blockstateId, unsupportedPropertySets);
@@ -108,8 +118,10 @@ public class FloodFillGeneralGenerator {
                 ColorReturn colorReturn = ColorExtractionAPI.getAverageColorForBlockstate(modId, blockstateId, AVGTypes.ARITHMETIC);
                 if (colorReturn == null) continue;
 
-                List<String> blockstatesWProperties = controller.getNotSupportedBlockstates(modId, blockstateId);
-                if (blockstatesWProperties.isEmpty()) continue;
+
+                Set<Map<String, Comparable<?>>> unsupportedPropertySets = controller.getNotSupportedBlockstates(modId, blockstateId);
+                if (unsupportedPropertySets == null) continue;
+                if (unsupportedPropertySets.isEmpty()) unsupportedPropertySets = null;
 
                 ColorRGBA color = colorReturn.color_avg;
                 double max = color.getMaxRGB();
@@ -123,7 +135,11 @@ public class FloodFillGeneralGenerator {
                 floodFillGeneralSupport.translucentSupport
                         .computeIfAbsent(tintData, k -> new HashMap<>())
                         .computeIfAbsent(modId, k -> new HashMap<>())
-                        .put(blockstateId, null);
+                        .put(blockstateId, unsupportedPropertySets);
+//                floodFillGeneralSupport.translucentSupport
+//                        .computeIfAbsent(tintData, k -> new HashMap<>())
+//                        .computeIfAbsent(modId, k -> new HashMap<>())
+//                        .put(blockstateId, null);
             }
         }
         LOGGER.info("Generated flood fill for translucent blocks");
@@ -140,8 +156,9 @@ public class FloodFillGeneralGenerator {
 
             for (Map.Entry<String, Double> blockEntry : blocksData.entrySet()) {
                 String blockstateId = blockEntry.getKey();
-                List<String> blockstatesWProperties = controller.getNotSupportedBlockstates(modId, blockstateId);
-                if (blockstatesWProperties.isEmpty()) continue;
+                Set<Map<String, Comparable<?>>> unsupportedPropertySets = controller.getNotSupportedBlockstates(modId, blockstateId);
+                if (unsupportedPropertySets == null) continue;
+                if (unsupportedPropertySets.isEmpty()) unsupportedPropertySets = null;
 
                 double volume = blockEntry.getValue();
 
@@ -151,9 +168,10 @@ public class FloodFillGeneralGenerator {
                 if (volume >= 1.0) continue;
                 short occlusionEntryId = volume2entry.get(volume);
 
-                for (String blockstateWProperties : blockstatesWProperties) {
-//                    floodFillSupportIntermediate.mainNonFullSupport.computeIfAbsent(occlusionEntryId, k -> new HashMap<>()).computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateWProperties);
-                }
+                floodFillGeneralSupport.mainNonFullSupport
+                        .computeIfAbsent(occlusionEntryId, k -> new HashMap<>())
+                        .computeIfAbsent(modId, k -> new HashMap<>())
+                        .put(blockstateId, unsupportedPropertySets);
             }
         }
         LOGGER.info("Generated flood fill for non full blocks");

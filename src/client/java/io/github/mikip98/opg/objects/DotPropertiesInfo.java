@@ -50,8 +50,8 @@ public class DotPropertiesInfo {
                             String propertyValue = propertyEntry.getValue();
                             if (propertyName2SimplifiedPropertyMap.containsKey(propertyName)) {
                                 if (propertyName2SimplifiedPropertyMap.get(propertyName) instanceof SimplifiedProperty simplifiedProperty) {
-                                    LOGGER.info("Property: {} = {}", propertyName, propertyValue);
-                                    LOGGER.info("Allowed values: {}", simplifiedProperty.allowedValues);
+//                                    LOGGER.info("Property: {} = {}", propertyName, propertyValue);
+//                                    LOGGER.info("Allowed values: {}", simplifiedProperty.allowedValues);
                                     simplifiedPropertySet.put(simplifiedProperty, simplifiedProperty.converter.apply(propertyValue));
                                 } else {
                                     LOGGER.error("Quantum properties are not supported right now: {}", propertyName);

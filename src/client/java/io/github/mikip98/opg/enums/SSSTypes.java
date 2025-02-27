@@ -6,6 +6,7 @@ public enum SSSTypes {
 
     GROUND_WAVING,
     GROUND_WAVING_VERTICAL,
+    CEILING_WAVING,
     AIR_WAVING,
 
     STRONG,

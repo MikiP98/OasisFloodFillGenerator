@@ -4,8 +4,8 @@ import io.github.mikip98.opg.generation.floodfill.FloodFillGeneralGenerator;
 import io.github.mikip98.opg.generation.floodfill.FloodFillSpecialGenerator;
 import io.github.mikip98.opg.generation.sss.SSSGenerator;
 import io.github.mikip98.opg.objects.DotPropertiesInfo;
-import io.github.mikip98.opg.objects.FloodFillSupportIntermediate;
-import io.github.mikip98.opg.objects.SSSSupportIntermediate;
+import io.github.mikip98.opg.generation.floodfill.FloodFillSupportIntermediate;
+import io.github.mikip98.opg.generation.sss.SSSSupportIntermediate;
 import io.github.mikip98.opg.structures.AutoSupport;
 
 import java.util.*;
@@ -48,20 +48,20 @@ public class MainGenerator {
         floodFillGeneralGenerator.generateFloodfillForLightEmittingBlocks();
 
         int blockCount = 0;
-        for (Map.Entry<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> entry : floodFillSupport.generalFloodFillSupport.lightEmittingSupport.entrySet()) {
+        for (Map.Entry<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> entry : floodFillSupport.generalFloodFillSupport.lightEmittingBlockSupport.entrySet()) {
             for (Map.Entry<String, Map<String, Set<Map<String, Comparable<?>>>>> modEntry : entry.getValue().entrySet()) {
                 for (Map.Entry<String, Set<Map<String, Comparable<?>>>> blockstateEntry : modEntry.getValue().entrySet()) {
-                    blockCount += blockstateEntry.getValue().size();
+                    if (blockstateEntry.getValue() != null) blockCount += blockstateEntry.getValue().size();
                 }
             }
         }
         LOGGER.info("Generated {} flood fill entries for light emitting blocks", blockCount);
 
         blockCount = 0;
-        for (Map.Entry<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> entry : floodFillGeneralGenerator.floodFillGeneralSupport.lightEmittingSupport.entrySet()) {
+        for (Map.Entry<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> entry : floodFillGeneralGenerator.floodFillGeneralSupport.lightEmittingBlockSupport.entrySet()) {
             for (Map.Entry<String, Map<String, Set<Map<String, Comparable<?>>>>> modEntry : entry.getValue().entrySet()) {
                 for (Map.Entry<String, Set<Map<String, Comparable<?>>>> blockstateEntry : modEntry.getValue().entrySet()) {
-                    blockCount += blockstateEntry.getValue().size();
+                    if (blockstateEntry.getValue() != null) blockCount += blockstateEntry.getValue().size();
                 }
             }
         }

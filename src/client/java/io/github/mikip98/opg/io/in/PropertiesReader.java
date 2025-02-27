@@ -1,4 +1,4 @@
-package io.github.mikip98.opg.io;
+package io.github.mikip98.opg.io.in;
 
 import io.github.mikip98.opg.objects.DotPropertiesInfo;
 import net.fabricmc.loader.api.FabricLoader;
@@ -140,6 +140,9 @@ public class PropertiesReader {
         );
     }
 
+    /**
+     * Adds to the map the blockstates with their property combinations, or blockstate with null if no properties are present
+     */
     protected static void addBlockstates(Map<String, Map<String, Set<Map<String, String>>>> map, List<String> blockstatesData) {
         for (String blockstateData : blockstatesData) {
             String[] parts = blockstateData.split(":", 3); // 0 -> modId, 1 -> blockstateId, 2 -> properties

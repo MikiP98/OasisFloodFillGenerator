@@ -1,4 +1,4 @@
-package io.github.mikip98.opg.objects;
+package io.github.mikip98.opg.generation.floodfill;
 
 import io.github.mikip98.opg.structures.FloodFillGeneralSupport;
 import io.github.mikip98.opg.structures.FloodFillSpecialSupport;
@@ -23,21 +23,17 @@ public class FloodFillSupportIntermediate {
     }
 
 
-    public @NotNull LinkedHashMap<Short, String> getLightEmittingEntries() {
-        int blockCount = 0;
-        for (Map.Entry<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> entry : generalFloodFillSupport.lightEmittingSupport.entrySet()) {
-            for (Map.Entry<String, Map<String, Set<Map<String, Comparable<?>>>>> modEntry : entry.getValue().entrySet()) {
-                for (Map.Entry<String, Set<Map<String, Comparable<?>>>> blockstateEntry : modEntry.getValue().entrySet()) {
-                    blockCount += blockstateEntry.getValue().size();
-                }
-            }
-        }
-        LOGGER.info("Requested string entries for '{}' light emitting blocks", blockCount);
-        return getStringEntriesFullSorted(generalFloodFillSupport.lightEmittingSupport);
+    public @NotNull LinkedHashMap<Short, String> getLightEmittingBlockEntries() {
+        return getStringEntriesFullSorted(generalFloodFillSupport.lightEmittingBlockSupport);
+    }
+    public @NotNull LinkedHashMap<Short, String> getLightEmittingItemEntries() {
+//        return getStringEntriesFullSorted(generalFloodFillSupport.lightEmittingItemSupport);
+        throw new UnsupportedOperationException();
     }
     public @NotNull LinkedHashMap<Short, String> getTranslucentEntries() {
         return getStringEntriesFullSorted(generalFloodFillSupport.translucentSupport);
     }
+
     public static @NotNull LinkedHashMap<Short, String> getStringEntriesFullSorted(Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> map) {
         LinkedHashMap<Short, String> result = new LinkedHashMap<>();
         getStringEntriesFull(map, result);
@@ -61,20 +57,30 @@ public class FloodFillSupportIntermediate {
 
         for (Short entryId : entryIds) {
             Map<String, Map<String, Set<Map<String, Comparable<?>>>>> mapMods = map.get(entryId);
-            List<String> modIds = new ArrayList<>( mapMods.keySet());
+            List<String> modIds = new ArrayList<>(mapMods.keySet());
             Collections.sort(modIds);
+
+            List<String> stringEntry = new ArrayList<>(mapMods.keySet().size());
 
             for (String modId : modIds) {
                 Map<String, Set<Map<String, Comparable<?>>>> mapBlockstates = mapMods.get(modId);
                 List<String> blockstateIds = new ArrayList<>(mapBlockstates.keySet());
                 Collections.sort(blockstateIds);
 
+                List<String> stringMod = new ArrayList<>(mapBlockstates.keySet().size());
+
                 for (String blockstateId : blockstateIds) {
                     Set<Map<String, Comparable<?>>> propertySets = mapBlockstates.get(blockstateId);
+//                    if (blockstateId.equals("red_umbrella_lamp")) {
+//                        LOGGER.info("'red_umbrella_lamp'");
+//                        LOGGER.info("entryId: {}", entryId);
+//                        LOGGER.info("propertySets: {}", propertySets);
+//                    }
                     if (propertySets == null || propertySets.isEmpty()) {
-                        result.put(entryId, modId + ":" + blockstateId);
+                        stringMod.add(modId + ":" + blockstateId);
                         continue;
                     }
+                    LOGGER.info("Property Sets: {}", propertySets);
                     // Sort this so that smaller sets are first then with alphabetical order
                     // Sort the set of maps
                     propertySets.stream()
@@ -97,14 +103,21 @@ public class FloodFillSupportIntermediate {
                                 // Iterate through the sorted map entries
                                 propertyMap.entrySet().stream()
                                         .sorted(Map.Entry.comparingByKey())
-                                        .forEach(entry -> {
-                                            properties[i.getAndIncrement()] = entry.getKey() + "=" + entry.getValue();
-                                        });
-                                if (properties.length == 0) result.put(entryId, modId + ":" + blockstateId);
-                                else result.put(entryId, modId + ":" + blockstateId + ":" + String.join(":", properties));
+                                        .forEach(entry -> properties[i.getAndIncrement()] = entry.getKey() + "=" + entry.getValue());
+                                if (properties.length == 0) throw new RuntimeException("No properties found for entryId " + entryId + " modId " + modId + " blockstateId " + blockstateId);   // result.put(entryId, modId + ":" + blockstateId);
+                                else stringMod.add(modId + ":" + blockstateId + ":" + String.join(":", properties));
                             });
+
+//                    if (blockstateId.equals("red_umbrella_lamp")) {
+//                        LOGGER.info("'red_umbrella_lamp'");
+//                        LOGGER.info("entryId: {}", entryId);
+//                        LOGGER.info("propertySets: {}", propertySets);
+//                        LOGGER.info("result: {}", result);
+//                    }
                 }
+                stringEntry.add(String.join(" ", stringMod));
             }
+            result.put(entryId, String.join(" \\\n ", stringEntry));
         }
     }
 }
