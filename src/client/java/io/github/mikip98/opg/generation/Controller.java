@@ -38,7 +38,7 @@ public class Controller {
             if (supportedStates == null) return null;
 
             // TODO: Add the missing logic
-            Set<Map<SimplifiedProperty, Comparable<?>>> missingCombinations = generateMissingCombinations(new HashMap<>(), supportedStates);
+            Set<Map<SimplifiedProperty, Comparable<?>>> missingCombinations = generateMissingCombinations(null, supportedStates);
             if (missingCombinations.isEmpty()) return null;
 
             for (Map<SimplifiedProperty, Comparable<?>> missingSet : missingCombinations) {
@@ -113,7 +113,10 @@ public class Controller {
 
 
 
-    protected Set<Map<SimplifiedProperty, Comparable<?>>> generateMissingCombinations(Map<SimplifiedProperty, Comparable<?>> newSet, Set<Map<SimplifiedProperty, Comparable<?>>> supportedStates) {
+    protected Set<Map<SimplifiedProperty, Comparable<?>>> generateMissingCombinations(
+            Map<SimplifiedProperty, Comparable<?>> newSet,
+            Set<Map<SimplifiedProperty, Comparable<?>>> currentlySupportedStates
+    ) {
         // Generate all possible combinations of property sets
         // Then remove the ones that are already supported or do not match the new set
 
@@ -128,7 +131,7 @@ public class Controller {
         // In each set check if the newSet's properties match, if not continue
         // Iterate though every property of the old set that is not in the new set
         // For each of thought properties, generate all possible combinations and add them to the missing combinations
-        // Do the last step recursively backwards fro every next property, a.k.a. do every next iteration on the resulting missing combinations set of the last one
+        // Do the last step recursively backwards for every next property, a.k.a. do every next iteration on the resulting missing combinations set of the last one
 
 
 
@@ -137,65 +140,74 @@ public class Controller {
 //        LOGGER.info("Supported Sets: {}", supportedStates);
         Set<Map<SimplifiedProperty, Comparable<?>>> missingCombinations = new HashSet<>();
 
+        if (newSet == null) {
+            // TODO: Generate missing combinations
 
-        Set<Map<SimplifiedProperty, Comparable<?>>> relevantSupportedSets = new HashSet<>();
-        Collection<SimplifiedProperty> newSetsProperties = newSet.keySet();
+            return missingCombinations;
 
-        // Iterate through already supported sets
-        // In each set check if the newSet's properties match
-        for (Map<SimplifiedProperty, Comparable<?>> supported : supportedStates) {
-            boolean propertiesMatch = true;
-            for (SimplifiedProperty property : newSetsProperties) {
-//                LOGGER.info("Iteration");
-//                LOGGER.info("Supported: {}", supported);
-//                LOGGER.info("new: {}", newSet);
-//                LOGGER.info("supported.containsKey(property) = {}", supported.containsKey(property));
-                if (supported.containsKey(property)) {
-//                if (containsKey(supported, property)) {
-//                    LOGGER.info("supported: {}; new: {}", supported.get(property), newSet.get(property));
-                    if (!supported.get(property).equals(newSet.get(property))) {
-                        propertiesMatch = false;
-                        break;
+        } else {
+            Set<Map<SimplifiedProperty, Comparable<?>>> relevantSupportedSets = new HashSet<>();
+            Collection<SimplifiedProperty> newSetsProperties = newSet.keySet();
+
+            // Iterate through already supported sets
+            // In each set check if the newSet's properties match
+            for (Map<SimplifiedProperty, Comparable<?>> supported : currentlySupportedStates) {
+                boolean propertiesMatch = true;
+                for (SimplifiedProperty property : newSetsProperties) {
+                    //                LOGGER.info("Iteration");
+                    //                LOGGER.info("Supported: {}", supported);
+                    //                LOGGER.info("new: {}", newSet);
+                    //                LOGGER.info("supported.containsKey(property) = {}", supported.containsKey(property));
+                    if (supported.containsKey(property)) {
+                        //                if (containsKey(supported, property)) {
+                        //                    LOGGER.info("supported: {}; new: {}", supported.get(property), newSet.get(property));
+                        if (!supported.get(property).equals(newSet.get(property))) {
+                            propertiesMatch = false;
+                            break;
+                        }
                     }
                 }
+                if (propertiesMatch) relevantSupportedSets.add(supported);
             }
-            if (propertiesMatch) relevantSupportedSets.add(supported);
-        }
-//        LOGGER.info("There are '{}' relevant property sets", relevantSupportedSets.size());
-        if (relevantSupportedSets.isEmpty()) return new HashSet<>(Set.of(newSet));
+            //        LOGGER.info("There are '{}' relevant property sets", relevantSupportedSets.size());
+            if (relevantSupportedSets.isEmpty()) {
+                assert !newSet.isEmpty();
+                return new HashSet<>(Set.of(newSet));
+            }
 
-        for (Map<SimplifiedProperty, Comparable<?>> supported : relevantSupportedSets) {
-            if (supported.equals(newSet)) continue;
+            for (Map<SimplifiedProperty, Comparable<?>> supported : relevantSupportedSets) {
+                if (supported.equals(newSet)) continue;
 
-            Set<Map<SimplifiedProperty, Comparable<?>>> missingCombinationsOfTheSet = new HashSet<>();
-            missingCombinationsOfTheSet.add(newSet);
+                Set<Map<SimplifiedProperty, Comparable<?>>> missingCombinationsOfTheSet = new HashSet<>();
+                missingCombinationsOfTheSet.add(newSet);
 
-            Collection<SimplifiedProperty> propertiesOfTheSet = supported.keySet();
-            // Iterate though every property of the old set that is not in the new set
-            for (SimplifiedProperty propertyOfTheSet : propertiesOfTheSet) {
-                if (newSetsProperties.contains(propertyOfTheSet)) continue;
+                Collection<SimplifiedProperty> propertiesOfTheSet = supported.keySet();
+                // Iterate though every property of the old set that is not in the new set
+                for (SimplifiedProperty propertyOfTheSet : propertiesOfTheSet) {
+                    if (newSetsProperties.contains(propertyOfTheSet)) continue;
 
-                Set<Map<SimplifiedProperty, Comparable<?>>> newMissingCombinationsOfTheSet = new HashSet<>();
-                // Iterate through all possible values of the property
-                for (Comparable<?> value : propertyOfTheSet.allowedValues) {
-                    if (value.equals(supported.get(propertyOfTheSet))) continue;
+                    Set<Map<SimplifiedProperty, Comparable<?>>> newMissingCombinationsOfTheSet = new HashSet<>();
+                    // Iterate through all possible values of the property
+                    for (Comparable<?> value : propertyOfTheSet.allowedValues) {
+                        if (value.equals(supported.get(propertyOfTheSet))) continue;
 
-                    for (Map<SimplifiedProperty, Comparable<?>> missingCombination : missingCombinationsOfTheSet) {
-                        missingCombination.put(propertyOfTheSet, value);
-                        newMissingCombinationsOfTheSet.add(missingCombination);
+                        for (Map<SimplifiedProperty, Comparable<?>> missingCombination : missingCombinationsOfTheSet) {
+                            missingCombination.put(propertyOfTheSet, value);
+                            newMissingCombinationsOfTheSet.add(missingCombination);
+                        }
                     }
+                    missingCombinationsOfTheSet = newMissingCombinationsOfTheSet;
                 }
-                missingCombinationsOfTheSet = newMissingCombinationsOfTheSet;
+
+                for (Map<SimplifiedProperty, Comparable<?>> missingCombination : missingCombinationsOfTheSet) {
+                    if (!missingCombination.isEmpty()) missingCombinations.add(missingCombination);
+                }
+                //            missingCombinations.addAll(missingCombinationsOfTheSet);
             }
 
-            for (Map<SimplifiedProperty, Comparable<?>> missingCombination : missingCombinationsOfTheSet) {
-                if (!missingCombination.isEmpty()) missingCombinations.add(missingCombination);
-            }
-//            missingCombinations.addAll(missingCombinationsOfTheSet);
+            //        LOGGER.info("Generated '{}' missing combinations", missingCombinations.size());
+            return missingCombinations;
         }
-
-//        LOGGER.info("Generated '{}' missing combinations", missingCombinations.size());
-        return missingCombinations;
     }
 
 

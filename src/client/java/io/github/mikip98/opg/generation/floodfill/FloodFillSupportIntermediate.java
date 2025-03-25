@@ -34,18 +34,19 @@ public class FloodFillSupportIntermediate {
         return getStringEntriesFullSorted(generalFloodFillSupport.translucentSupport);
     }
 
+    public @NotNull LinkedHashMap<Short, String> getMainNonFullEntries() {
+        return getStringEntriesFullSorted(generalFloodFillSupport.mainNonFullSupport);
+    }
+
+
+//    public static @NotNull Map<Short, String> getStringEntriesFullSemiSorted(Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> map) {
+//        Map<Short, String> result = new HashMap<>();
+//        getStringEntriesFull(map, result);
+//        return result;
+//    }
+
     public static @NotNull LinkedHashMap<Short, String> getStringEntriesFullSorted(Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> map) {
         LinkedHashMap<Short, String> result = new LinkedHashMap<>();
-        getStringEntriesFull(map, result);
-        return result;
-    }
-
-
-    public @NotNull Map<Short, String> getMainNonFullEntries() {
-        return getStringEntriesFullSemiSorted(generalFloodFillSupport.mainNonFullSupport);
-    }
-    public static @NotNull Map<Short, String> getStringEntriesFullSemiSorted(Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> map) {
-        Map<Short, String> result = new HashMap<>();
         getStringEntriesFull(map, result);
         return result;
     }
@@ -80,7 +81,7 @@ public class FloodFillSupportIntermediate {
                         stringMod.add(modId + ":" + blockstateId);
                         continue;
                     }
-                    LOGGER.info("Property Sets: {}", propertySets);
+//                    LOGGER.info("Property Sets: {}", propertySets);
                     // Sort this so that smaller sets are first then with alphabetical order
                     // Sort the set of maps
                     propertySets.stream()

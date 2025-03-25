@@ -15,8 +15,8 @@ public class SSSSupportIntermediate {
         this.simpleSSSSupport = simpleSSSSupport;
     }
 
-    public Map<Short, String> getSSSSupportStringEntries() {
-        Map<Short, String> result = new HashMap<>();
+    public LinkedHashMap<Short, String> getSSSSupportStringEntries() {
+        LinkedHashMap<Short, String> result = new LinkedHashMap<>();
 
         List<Short> entryIds = new ArrayList<>(simpleSSSSupport.keySet());
         Collections.sort(entryIds);
