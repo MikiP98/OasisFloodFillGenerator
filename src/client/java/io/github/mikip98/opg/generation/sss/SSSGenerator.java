@@ -8,54 +8,49 @@ import net.minecraft.block.*;
 
 import java.util.*;
 
+import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
+
 public class SSSGenerator {
 
     public static SSSSupportIntermediate generateSSS(Controller controller) {
-        final Set<Class<?>> classesOfInterest = Set.of(
-                AbstractBannerBlock.class,      // Wall and Floor Banners
-                AbstractPlantPartBlock.class,   // E.G. Kelp; SSS but no waving
-                GrassBlock.class,               // Grass
-                LeavesBlock.class,              // All leaves
-                MushroomPlantBlock.class,       // Mushrooms, CAUTION: Extends 'PlantBlock'!
-                PlantBlock.class,               // All plants, INCLUDING TALL PLANTS & MUSHROOMS!!!
-                TallPlantBlock.class            // Tall plants (2 blocks), CAUTION: Extends 'PlantBlock'!
-        );
-        Map<Class<?>, Map<String, List<String>>> dataOfInterest = BlockstatesAPI.getChildBlockstatesOfClasses(classesOfInterest);
+        Map<Class<?>, Map<String, List<String>>> vanillaBlocks = getVanillaBlocks();
 
-        Map<String, List<String>> plants = dataOfInterest.get(PlantBlock.class);
-        Map<String, List<String>> mushrooms = dataOfInterest.get(MushroomPlantBlock.class);
-        Map<String, List<String>> tallPlants = dataOfInterest.get(TallPlantBlock.class);
+        Map<String, List<String>> plants = vanillaBlocks.get(PlantBlock.class);  // Later replaced with otherPlants
+        Map<String, List<String>> mushrooms = vanillaBlocks.get(MushroomPlantBlock.class);
+        Map<String, List<String>> tallPlants = vanillaBlocks.get(TallPlantBlock.class);
 
-        Map<String, List<String>> otherPlants = new HashMap<>();  // plants - (mushrooms + tallPlants)
+        Map<Class<?>, Map<String, List<String>>> bopBlocks = getBOPBlocks();
 
-        for (Map.Entry<String, List<String>> entry : plants.entrySet()) {
-            String modId = entry.getKey();
-            List<String> blockstateIds = entry.getValue();
-            if (mushrooms.containsKey(modId)) {
-                for (String blockstateId : blockstateIds) {
-                    if (!mushrooms.get(modId).contains(blockstateId)) {
-                        otherPlants.computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
-                    }
-                }
-            } else if (tallPlants.containsKey(modId)) {
-                for (String blockstateId : blockstateIds) {
-                    if (!tallPlants.get(modId).contains(blockstateId)) {
-                        otherPlants.computeIfAbsent(modId, k -> new ArrayList<>()).add(blockstateId);
-                    }
-                }
-            } else {
-                otherPlants.put(modId, blockstateIds);
+        Map<String, List<String>> leafPiles = null;
+        if (bopBlocks != null) {
+            leafPiles = bopBlocks.get(biomesoplenty.block.LeafPileBlock.class);
+            for (String modId : leafPiles.keySet()) {
+                vanillaBlocks.get(AbstractPlantPartBlock.class).computeIfAbsent(modId, k -> new ArrayList<>()).addAll(leafPiles.get(modId));
             }
         }
 
-        dataOfInterest.put(PlantBlock.class, otherPlants);
-//        dataOfInterest.remove(MushroomPlantBlock.class);
-//        dataOfInterest.remove(TallPlantBlock.class);
+        Map<String, List<String>> otherPlants = new HashMap<>();  // plants - (mushrooms + tallPlants)
+        for (Map.Entry<String, List<String>> entry : plants.entrySet()) {
+            String modId = entry.getKey();
+            List<String> blockstateIds = entry.getValue();
+
+            List<String> blockToFilterOut = new ArrayList<>();
+            if (mushrooms.containsKey(modId)) blockToFilterOut.addAll(mushrooms.get(modId));
+            if (tallPlants.containsKey(modId)) blockToFilterOut.addAll(tallPlants.get(modId));
+            if (leafPiles != null && leafPiles.containsKey(modId)) blockToFilterOut.addAll(leafPiles.get(modId));
+
+            if (!blockToFilterOut.isEmpty())
+                blockstateIds = blockstateIds.stream().filter(blockstateId -> !blockToFilterOut.contains(blockstateId)).toList();
+
+            otherPlants.put(modId, blockstateIds);
+        }
+
+        vanillaBlocks.put(PlantBlock.class, otherPlants);
 
         // EntryId -> ModId -> BlockstateId -> UnsupportedPropertySets
         Map<Short, Map<String, Map<String, Set<Map<String, Comparable<?>>>>>> SSSSupportEntries = new HashMap<>();
 
-        for (Map.Entry<Class<?>, Map<String, List<String>>> entry : dataOfInterest.entrySet()) {
+        for (Map.Entry<Class<?>, Map<String, List<String>>> entry : vanillaBlocks.entrySet()) {
             Class<?> clazz = entry.getKey();
             SSSTypes category = Config.MCClass2SSSCategory.get(clazz);
             short entryId = Config.SSSCategory2EntryId.get(category);
@@ -115,5 +110,31 @@ public class SSSGenerator {
         return new SSSSupportIntermediate(
                 SSSSupportEntries
         );
+    }
+
+    protected static Map<Class<?>, Map<String, List<String>>> getVanillaBlocks() {
+        final Set<Class<?>> classesOfInterest = Set.of(
+                AbstractBannerBlock.class,      // Wall and Floor Banners
+                AbstractPlantPartBlock.class,   // E.G. Kelp; SSS but no waving
+                GrassBlock.class,               // Grass
+                LeavesBlock.class,              // All leaves
+                MushroomPlantBlock.class,       // Mushrooms, CAUTION: Extends 'PlantBlock'!
+                PlantBlock.class,               // All plants, INCLUDING TALL PLANTS & MUSHROOMS!!!
+                TallPlantBlock.class            // Tall plants (2 blocks), CAUTION: Extends 'PlantBlock'!
+        );
+        return BlockstatesAPI.getChildBlockstatesOfClasses(classesOfInterest);
+    }
+
+    protected static Map<Class<?>, Map<String, List<String>>> getBOPBlocks() {
+        try {
+            final Set<Class<?>> classesOfInterest = Set.of(
+                    biomesoplenty.block.LeafPileBlock.class
+            );
+            return BlockstatesAPI.getChildBlockstatesOfClasses(classesOfInterest);
+
+        } catch (NoClassDefFoundError e) {
+            LOGGER.warn("Biomes O' Plenty blocks classes were not found. You can ignore it if you don't use this mod.");
+            return null;
+        }
     }
 }

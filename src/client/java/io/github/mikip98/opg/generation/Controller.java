@@ -209,22 +209,4 @@ public class Controller {
             return missingCombinations;
         }
     }
-
-
-//    private boolean containsKey(Map<SimplifiedProperty, Comparable<?>> supported, SimplifiedProperty property) {
-//        for (SimplifiedProperty mapProperty : supported.keySet()) {
-//            if (mapProperty.name.equals(property.name)) {
-//                LOGGER.info("Found matching property name: {}", mapProperty.name);
-//
-//                LOGGER.info("mapProperty.allowedValues.equals(property.allowedValues) = {}", mapProperty.allowedValues.equals(property.allowedValues));
-//                LOGGER.info("mapProperty.converter.equals(property.converter) = {}", mapProperty.converter.equals(property.converter));
-//
-//                LOGGER.info("mapProperty.equals(property) = {}", mapProperty.equals(property));
-//                LOGGER.info("supported.containsKey(property) = {}", supported.containsKey(property));
-//
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 }

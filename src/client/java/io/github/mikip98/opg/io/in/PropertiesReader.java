@@ -45,14 +45,14 @@ public class PropertiesReader {
                 String line;
                 while ((line = br.readLine()) != null) {
                     line = line.strip().toLowerCase();
-                    LOGGER.info("Line: {}", line);
+//                    LOGGER.info("Line: {}", line);
 
                     // Check for already existing auto support
                     if (line.equalsIgnoreCase("#########                       AUTO GENERATED SHADER SUPPORT BY 'OASIS AUTO GENERATOR'                        #########")) {
                         do {
                             line = line.strip().toLowerCase();
                             if (line.startsWith("#define")) {
-                                LOGGER.info("Found OAE define: {}", line);
+//                                LOGGER.info("Found OAE define: {}", line);
                                 // TODO
                             }
                         } while ((line = br.readLine()) != null && line.strip().startsWith("#"));
@@ -73,26 +73,28 @@ public class PropertiesReader {
                     if (line.startsWith("block.")) {
                         String[] parts = line.split("=", 2);
 
-                        for (String entry : parts[1].split(" ")) {
+                        String[] lineEntries = parts[1].split(" ");
+                        for (String entry : lineEntries) {
                             if (defines.containsKey(entry)) {
                                 entries.addAll(List.of(defines.get(entry).split(" ")));
                             }
                             else if (!entry.equals("\\")) entries.add(entry);
                         }
-                        String lastEntry = entries.get(entries.size() - 1);
+                        String lastEntry = lineEntries[lineEntries.length - 1];
 
                         while (lastEntry.equals("\\")) {
                             line = br.readLine();
                             if (line == null) break;
                             line = line.strip().toLowerCase();
 
-                            for (String entry : line.split(" ")) {
+                            lineEntries = line.split(" ");
+                            for (String entry : lineEntries) {
                                 if (defines.containsKey(entry)) {
                                     entries.addAll(List.of(defines.get(entry).split(" ")));
                                 }
                                 else if (!entry.equals("\\")) entries.add(entry);
                             }
-                            lastEntry = entries.get(entries.size() - 1);
+                            lastEntry = lineEntries[lineEntries.length - 1];
                         }
                     }
                 }
@@ -103,6 +105,8 @@ public class PropertiesReader {
                 LOGGER.error("Error while reading block.properties", e);
             }
         }
+
+        LOGGER.info("Mods with native support: {}", nativelySupportedBlockstates.keySet());
 
         return nativelySupportedBlockstates;
     }
@@ -120,7 +124,7 @@ public class PropertiesReader {
 
                 while ((line = br.readLine()) != null) {
                     line = line.strip().toLowerCase();
-                    LOGGER.info("Line: {}", line);
+//                    LOGGER.info("Line: {}", line);
 
                     // TODO
                 }
@@ -168,6 +172,10 @@ public class PropertiesReader {
                 modId = parts[0];
                 blockstateId = parts[1];
                 propertiesData = List.of(parts[2].split(":"));
+            }
+
+            if (modId.equals("biomesoplenty")) {
+                LOGGER.info("Found bop entry: {}", blockstateId);
             }
 
             if (propertiesData == null || propertiesData.isEmpty()) {

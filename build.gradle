@@ -45,6 +45,9 @@ dependencies {
 
 	// Main library
 	modImplementation files("libs/data-extraction-library-${project.data_extraction_library_version}.jar")
+
+	// Other mods
+	modClientCompileOnly files("libs/BiomesOPlenty-fabric-${project.bop_version}.jar")
 }
 
 processResources {
