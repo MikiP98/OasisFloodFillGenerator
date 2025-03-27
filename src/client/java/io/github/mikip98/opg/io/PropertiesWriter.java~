@@ -1,0 +1,234 @@
+package io.github.mikip98.opg.io;
+
+import io.github.mikip98.opg.config.Config;
+import io.github.mikip98.opg.objects.FloodFillSupportIntermediate;
+import io.github.mikip98.opg.objects.SSSSupportIntermediate;
+import io.github.mikip98.opg.structures.AutoSupport;
+import net.fabricmc.loader.api.FabricLoader;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Stream;
+
+import static io.github.mikip98.opg.OasisPropertyGeneratorClient.LOGGER;
+
+public class PropertiesWriter {
+    protected FloodFillSupportIntermediate floodFillSupport;
+    protected SSSSupportIntermediate sssSupport;
+
+    public PropertiesWriter(AutoSupport autoSupport) {
+        this.floodFillSupport = autoSupport.floodFillSupportIntermediate;
+        this.sssSupport = autoSupport.sssSupportIntermediate;
+    }
+
+    public void writeToProperties() {
+        Path configPath = FabricLoader.getInstance().getGameDir().resolve("config/oasis-property-generator");
+
+        // Create the config directory if it doesn't exist
+        try {
+            Files.createDirectories(configPath);
+        } catch (IOException e) {
+            LOGGER.error("Error while creating config directory", e);
+        }
+
+        try (Stream<Path> paths = Files.list(configPath)) {
+            for (Path file : paths.toList()) {
+                String fileName = file.getFileName().toString();
+                LOGGER.info("checking file: {}", fileName);
+                if (fileName.endsWith(".properties")) {
+                    LOGGER.info("Writing properties file: {}", fileName);
+                    if (fileName.startsWith("block.")) {
+                        // Handle 'block.properties' type file
+                        handleBlockPropertiesFile(file);
+                    }
+                    else if (fileName.startsWith("item.")) {
+                        // Handle 'item.properties' type file
+                        handleItemPropertiesFile(file);
+                    }
+                    else if (fileName.startsWith("entity.")) {
+                        // Handle 'entity.properties' type file
+                        // TODO?
+                        continue;
+                    }
+                    else if (fileName.startsWith("empty")) {
+                        // Handle 'empty.properties' type file
+                        handleEmptyPropertiesFile(file);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while writing properties file", e);
+        }
+    }
+
+    // Blocks
+    protected void handleBlockPropertiesFile(Path file) {
+        StringBuilder new_properties = new StringBuilder();
+
+        Set<Short> ignoreFloodfillIds = new HashSet<>();
+        Set<Short> entriesOfInterest = new HashSet<>(Config.SSSCategory2EntryId.values());
+        for (int i = 0; i < Config.floodFillIgnoreEntryCount; i++) {
+            short entryId = (short) (Config.floodFillIgnoreFirstEntryId + i);
+            ignoreFloodfillIds.add(entryId);
+            entriesOfInterest.add(entryId);
+        }
+
+        Map<Short, String> generalNonFullSupport = floodFillSupport.getMainNonFullEntries();
+        Map<Short, String> sssSupportEntries = sssSupport.getSSSSupportStringEntries();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file.toString()))) {
+            String originalLine;
+            String line;
+
+            boolean continuationOfInterest = false;
+            Short interestId = null;
+            boolean skipMainAppend = false;
+
+            while ((originalLine = br.readLine()) != null) {
+                line = originalLine.strip().toLowerCase();
+
+                if (line.startsWith("block.")) {
+                    String[] keyValue = line.split("=", 2);
+                    Short entryId = Short.valueOf(keyValue[0].strip().substring(6));  // TODO: int?
+
+                    if (entriesOfInterest.contains(entryId)) {
+                        String[] entryEntries = keyValue[1].strip().split(" ");
+                        String lastEntry = entryEntries[entryEntries.length - 1];
+
+                        if (lastEntry.strip().equals("\\")) continuationOfInterest = true;
+                        interestId = entryId;
+                    }
+                }
+                else if (continuationOfInterest) {
+                    if (line.toUpperCase().startsWith("#IFDEF AUTO_GENERATED_")) {
+                        new_properties.replace(new_properties.length() - 3, new_properties.length(), "");
+                        while ((line = br.readLine()) != null) {
+                            line = line.strip().toLowerCase();
+                            if (line.toUpperCase().startsWith("#ENDIF")) break;
+                        }
+                        br.readLine(); // Skip the null
+                        skipMainAppend = true;
+                        continuationOfInterest = false;
+                    } else {
+                        String[] entryEntries = line.strip().split(" ");
+                        String lastEntry = entryEntries[entryEntries.length - 1];
+
+                        if (!lastEntry.strip().equals("\\")) continuationOfInterest = false;
+                    }
+                }
+
+                if (!skipMainAppend) new_properties.append(originalLine);
+
+                if (!continuationOfInterest && interestId != null) {
+                    if (ignoreFloodfillIds.contains(interestId)) {
+                        new_properties.append(" \\\n")
+                                .append("#ifdef AUTO_GENERATED_FLOODFILL\n ")
+                                .append(generalNonFullSupport.get(interestId))
+                                .append("\n#endif\nnull");
+                    }
+                    else if (Config.SSSCategory2EntryId.containsValue(interestId)) {
+                        if (Config.mainSSSEntryIds.contains(interestId)) {
+                            new_properties.append(" \\\n")
+                                    .append("#ifdef AUTO_GENERATED_SSS\n ")
+                                    .append(sssSupportEntries.get(interestId))
+                                    .append("\n#endif\nnull");
+                        }
+                        else if (Config.specialSSSEntryIds.contains(interestId)) {
+                            switch (interestId) {
+                                case Config.ID_SSS_TALL_PLANT_LOWER -> {
+                                    
+                                }
+                                case Config.ID_SSS_TALL_PLANT_UPPER -> {
+
+                                }
+                                default -> LOGGER.error("Unsupported special SSS entry: {}", interestId);
+                            }
+                        }
+                    }
+                    else {
+                        LOGGER.warn("Current entry of interest is not yet supported!");
+                    }
+                    skipMainAppend = false;
+                    interestId = null;
+                }
+
+                if (!skipMainAppend) new_properties.append("\n");
+                skipMainAppend = false;
+            }
+
+            new_properties.append("\n\n\n# Auto FloodFill generated by 'Oasis Property Generator'\n");
+            new_properties.append("#ifdef AUTO_GENERATED_FLOODFILL\n");
+
+            new_properties.append("\n# Emissive\n");
+            LinkedHashMap<Short, String> emissiveEntriesMap = floodFillSupport.getLightEmittingBlockEntries();
+            LOGGER.info("Writing '{}', emissive block entries", emissiveEntriesMap.size());
+            for (Short entryId : emissiveEntriesMap.keySet()) {
+                new_properties
+                        .append("block.").append(entryId)
+                        .append(" = ")
+                        .append(emissiveEntriesMap.get(entryId))
+                        .append("\n");
+            }
+
+            new_properties.append("\n# Translucent\n");
+            LinkedHashMap<Short, String> floodFillTranslucentEntriesMap = floodFillSupport.getTranslucentEntries();
+            LOGGER.info("Writing '{}', translucent entries", floodFillTranslucentEntriesMap.size());
+            for (Short entryId : floodFillTranslucentEntriesMap.keySet()) {
+                new_properties
+                        .append("block.").append(entryId)
+                        .append(" = ")
+                        .append(floodFillTranslucentEntriesMap.get(entryId))
+                        .append("\n");
+            }
+
+            new_properties.append("\n#endif\n");
+
+            writeToFile(file, new_properties);
+        } catch (IOException e) {
+            LOGGER.error("Error while writing properties file", e);
+        }
+    }
+
+    // Items
+    protected static void handleItemPropertiesFile(Path file) {
+        StringBuilder new_properties = new StringBuilder();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file.toString()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.strip().toLowerCase();
+
+                if (line.startsWith("item.")) {
+
+                }
+                // TODO
+            }
+
+            writeToFile(file, new_properties);
+        } catch (IOException e) {
+            LOGGER.error("Error while writing properties file", e);
+        }
+    }
+
+    // Empty
+    protected static void handleEmptyPropertiesFile(Path file) {
+        StringBuilder new_properties = new StringBuilder();
+
+        // TODO
+
+        writeToFile(file, new_properties);
+    }
+
+    protected static void writeToFile(Path file, StringBuilder new_properties) {
+        try {
+            Files.write(file, new_properties.toString().getBytes());
+        } catch (IOException e) {
+            LOGGER.error("Error while writing properties file", e);
+        }
+    }
+}
